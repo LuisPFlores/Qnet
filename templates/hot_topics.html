@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Hot Topics - QNet Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-fire me-2"></i>Hot Topics in Quantum Networking</h2>
+        <p class="text-muted">Topics ranked by frequency, recency, and cross-source presence</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Topic Rankings -->
+    <div class="col-lg-7 mb-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0">Topic Rankings</h5>
+            </div>
+            <div class="card-body">
+                {% if topics %}
+                <table class="table table-dark table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Topic</th>
+                            <th>Mentions</th>
+                            <th>Score</th>
+                            <th>Sources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for topic in topics %}
+                        <tr>
+                            <td>
+                                {% if loop.index <= 3 %}
+                                <span class="badge bg-danger">{{ loop.index }}</span>
+                                {% else %}
+                                <span class="text-muted">{{ loop.index }}</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ topic.name }}</strong></td>
+                            <td>{{ topic.count }}</td>
+                            <td>
+                                <div class="progress" style="height: 20px; min-width: 100px;">
+                                    <div class="progress-bar bg-info" style="width: {{ (topic.score * 100)|int }}%">
+                                        {{ "%.0f"|format(topic.score * 100) }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% for src in topic.source_types %}
+                                <span class="badge bg-{{ 'primary' if src == 'arxiv' else 'success' if src == 'scholar' else 'warning' if src == 'ieee' else 'danger' if src == 'company' else 'secondary' }} small">
+                                    {{ src }}
+                                </span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted text-center">No topics yet. Collect content first!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <div class="col-lg-5 mb-4">
+        <div class="card bg-dark border-secondary mb-4">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0">Scoring Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Topics are scored using three factors:</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-dark border-secondary">
+                        <strong class="text-info">Recency (40%)</strong> - How recently the topic was mentioned
+                    </li>
+                    <li class="list-group-item bg-dark border-secondary">
+                        <strong class="text-warning">Frequency (35%)</strong> - How many articles mention this topic
+                    </li>
+                    <li class="list-group-item bg-dark border-secondary">
+                        <strong class="text-success">Cross-source (25%)</strong> - How many different source types mention it
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Trends -->
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Trends (30 days)</h5>
+            </div>
+            <div class="card-body">
+                {% if trends %}
+                {% for trend in trends %}
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
+                    <span>{{ trend.name }}</span>
+                    <span class="badge bg-{{ 'success' if trend.trend == 'rising' else 'info' if trend.trend == 'new' else 'warning' if trend.trend == 'stable' else 'secondary' }}">
+                        {% if trend.trend == 'rising' %}<i class="bi bi-arrow-up"></i>{% endif %}
+                        {% if trend.trend == 'new' %}<i class="bi bi-star"></i>{% endif %}
+                        {% if trend.trend == 'stable' %}<i class="bi bi-dash"></i>{% endif %}
+                        {% if trend.trend == 'declining' %}<i class="bi bi-arrow-down"></i>{% endif %}
+                        {{ trend.trend }}
+                    </span>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted small">Need more data to show trends.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Analysis -->
+{% if analysis %}
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0"><i class="bi bi-robot text-info me-2"></i>AI Hot Topics Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div class="analysis-content">{{ analysis | replace('\n', '<br>') | safe }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

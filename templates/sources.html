@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Sources - QNet Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-collection me-2"></i>Sources</h2>
+        <p class="text-muted">Configured data sources for quantum networking content</p>
+    </div>
+</div>
+
+<!-- Source type sections -->
+{% set source_types = {'arxiv': 'Academic Preprints', 'scholar': 'Academic Search', 'ieee': 'IEEE Proceedings', 'company': 'Industry / Companies', 'university': 'University Research Groups'} %}
+{% set source_icons = {'arxiv': 'bi-file-earmark-text', 'scholar': 'bi-search', 'ieee': 'bi-journal-bookmark', 'company': 'bi-building', 'university': 'bi-mortarboard'} %}
+{% set source_colors = {'arxiv': 'primary', 'scholar': 'success', 'ieee': 'warning', 'company': 'danger', 'university': 'secondary'} %}
+
+{% for stype, label in source_types.items() %}
+<div class="card bg-dark border-secondary mb-4">
+    <div class="card-header bg-dark border-secondary">
+        <h5 class="mb-0">
+            <i class="bi {{ source_icons[stype] }} text-{{ source_colors[stype] }} me-2"></i>{{ label }}
+        </h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-dark table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th>Last Fetched</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for source in sources if source.source_type == stype %}
+                <tr>
+                    <td>{{ source.name }}</td>
+                    <td>
+                        {% if source.url %}
+                        <a href="{{ source.url }}" target="_blank" class="text-info small">
+                            {{ source.url[:60] }}{% if source.url|length > 60 %}...{% endif %}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if source.last_fetched %}
+                        <small>{{ source.last_fetched.strftime('%Y-%m-%d %H:%M') }}</small>
+                        {% else %}
+                        <small class="text-muted">Never</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if source.active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-muted text-center">No sources configured</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - QNet Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+        <p class="text-muted">Quantum Network Intelligence Overview</p>
+    </div>
+</div>
+
+<!-- Stats cards -->
+<div class="row mb-4">
+    <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card bg-dark border-info h-100">
+            <div class="card-body text-center">
+                <h3 class="text-info">{{ stats.article_counts.get('total', 0) }}</h3>
+                <small class="text-muted">Total Articles</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card bg-dark border-primary h-100">
+            <div class="card-body text-center">
+                <h3 class="text-primary">{{ stats.article_counts.get('arxiv', 0) }}</h3>
+                <small class="text-muted">arXiv Papers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card bg-dark border-success h-100">
+            <div class="card-body text-center">
+                <h3 class="text-success">{{ stats.article_counts.get('scholar', 0) }}</h3>
+                <small class="text-muted">Scholar Papers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card bg-dark border-warning h-100">
+            <div class="card-body text-center">
+                <h3 class="text-warning">{{ stats.article_counts.get('ieee', 0) }}</h3>
+                <small class="text-muted">IEEE Papers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card bg-dark border-danger h-100">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ stats.article_counts.get('company', 0) }}</h3>
+                <small class="text-muted">Company News</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 mb-3">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-body text-center">
+                <h3>{{ stats.article_counts.get('university', 0) }}</h3>
+                <small class="text-muted">University Items</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Hot Topics -->
+    <div class="col-lg-5 mb-4">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0"><i class="bi bi-fire text-danger me-2"></i>Hot Topics</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.hot_topics %}
+                <div class="list-group list-group-flush">
+                    {% for topic in stats.hot_topics %}
+                    <div class="list-group-item bg-dark border-secondary d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ topic.name }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                {{ topic.count }} mentions |
+                                Sources: {{ topic.source_types | join(', ') }}
+                            </small>
+                        </div>
+                        <div>
+                            <span class="badge bg-info">{{ "%.0f"|format(topic.score * 100) }}%</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center mt-3">
+                    No topics yet. Click <strong>"Give me the last content"</strong> to start collecting!
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Articles -->
+    <div class="col-lg-7 mb-4">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0"><i class="bi bi-journal-text text-info me-2"></i>Recent Articles</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_articles %}
+                {% for article in stats.recent_articles %}
+                <div class="mb-3 pb-3 border-bottom border-secondary">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-1">
+                            {% if article.url %}
+                            <a href="{{ article.url }}" target="_blank" class="text-info text-decoration-none">
+                                {{ article.title[:100] }}{% if article.title|length > 100 %}...{% endif %}
+                            </a>
+                            {% else %}
+                            {{ article.title[:100] }}{% if article.title|length > 100 %}...{% endif %}
+                            {% endif %}
+                        </h6>
+                        <span class="badge bg-{{ 'primary' if article.source_type == 'arxiv' else 'success' if article.source_type == 'scholar' else 'warning' if article.source_type == 'ieee' else 'danger' if article.source_type == 'company' else 'secondary' }} ms-2">
+                            {{ article.source }}
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        {{ article.authors[:80] }}{% if article.authors|length > 80 %}...{% endif %}
+                        {% if article.published_date %} | {{ article.published_date[:10] }}{% endif %}
+                    </small>
+                    {% if article.summary %}
+                    <p class="mt-1 mb-0 small">{{ article.summary[:200] }}{% if article.summary|length > 200 %}...{% endif %}</p>
+                    {% endif %}
+                    {% if article.topics %}
+                    <div class="mt-1">
+                        {% for topic in article.topics[:5] %}
+                        <span class="badge bg-secondary small">{{ topic }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center mt-3">
+                    No articles yet. Click <strong>"Give me the last content"</strong> to start collecting!
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Analysis -->
+{% if stats.latest_snapshot and stats.latest_snapshot.analysis %}
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-dark border-secondary">
+                <h5 class="mb-0">
+                    <i class="bi bi-robot text-info me-2"></i>AI Analysis
+                    {% if stats.latest_snapshot.generated_at %}
+                    <small class="text-muted ms-2">
+                        Generated: {{ stats.latest_snapshot.generated_at }}
+                    </small>
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="analysis-content">{{ stats.latest_snapshot.analysis | safe }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

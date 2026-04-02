@@ -2,7 +2,8 @@
 QNet Agent – Flask Application
 Quantum Network Intelligence Consolidator
 
-Run with:  python app.py
+Development:  python app.py
+Production:   python run_server.py   (Waitress, used by IIS)
 """
 
 import logging

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+
+# Environment
+.env
+
+# Database
+data/*.db
+
+# Logs
+logs/
+
+# IIS
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp

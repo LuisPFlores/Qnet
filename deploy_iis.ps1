@@ -20,7 +20,7 @@
 
 [CmdletBinding()]
 param(
-    # ── Configurable parameters ──────────────────────────────────────
+    # -- Configurable parameters ---------------------------------------
     [string]$SiteName       = "QNetAgent",
     [string]$AppPoolName    = "QNetAgentPool",
     [int]   $Port           = 80,
@@ -30,9 +30,9 @@ param(
     [string]$SourcePath     = $PSScriptRoot      # directory containing this script
 )
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  0. PRE-FLIGHT CHECKS
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 $ErrorActionPreference = "Stop"
 
 function Write-Step  { param([string]$msg) Write-Host "`n>> $msg" -ForegroundColor Cyan }
@@ -49,7 +49,7 @@ if (-not $isAdmin) {
 }
 
 Write-Host "============================================================" -ForegroundColor White
-Write-Host "  QNet Agent – IIS Deployment Script" -ForegroundColor Cyan
+Write-Host "  QNet Agent - IIS Deployment Script" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor White
 Write-Host ""
 Write-Host "  Site name    : $SiteName"
@@ -61,10 +61,10 @@ Write-Host "  Source       : $SourcePath"
 Write-Host ""
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  1. VERIFY PYTHON IS INSTALLED
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "1/9 – Checking Python installation"
+# =====================================================================
+Write-Step "1/9 - Checking Python installation"
 
 if (-not (Test-Path $PythonPath)) {
     Write-Fail "Python not found at $PythonPath"
@@ -83,10 +83,10 @@ $pyVersion = & $PythonPath --version 2>&1
 Write-OK "Found $pyVersion at $PythonPath"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  2. INSTALL IIS + REQUIRED FEATURES
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "2/9 – Installing IIS features"
+# =====================================================================
+Write-Step "2/9 - Installing IIS features"
 
 $features = @(
     "IIS-WebServerRole",
@@ -114,10 +114,10 @@ foreach ($feature in $features) {
 }
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  3. INSTALL HttpPlatformHandler
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "3/9 – Installing HttpPlatformHandler"
+# =====================================================================
+Write-Step "3/9 - Installing HttpPlatformHandler"
 
 $hphDll = "$env:SystemRoot\System32\inetsrv\httpPlatformHandler.dll"
 if (Test-Path $hphDll) {
@@ -142,10 +142,10 @@ if (Test-Path $hphDll) {
 }
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  4. COPY APPLICATION FILES
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "4/9 – Copying application files to $PhysicalPath"
+# =====================================================================
+Write-Step "4/9 - Copying application files to $PhysicalPath"
 
 if (-not (Test-Path $PhysicalPath)) {
     New-Item -ItemType Directory -Path $PhysicalPath -Force | Out-Null
@@ -168,10 +168,10 @@ New-Item -ItemType Directory -Path "$PhysicalPath\logs" -Force | Out-Null
 Write-OK "Application files deployed"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  5. CREATE VIRTUAL ENVIRONMENT + INSTALL DEPENDENCIES
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "5/9 – Creating Python virtual environment"
+# =====================================================================
+Write-Step "5/9 - Creating Python virtual environment"
 
 $venvPath = "$PhysicalPath\venv"
 if (-not (Test-Path "$venvPath\Scripts\python.exe")) {
@@ -187,15 +187,15 @@ Write-Host "   Installing Python dependencies (this may take a few minutes)..."
 Write-OK "Dependencies installed"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  6. CONFIGURE .env FILE
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "6/9 – Configuring environment variables"
+# =====================================================================
+Write-Step "6/9 - Configuring environment variables"
 
 $envFile = "$PhysicalPath\.env"
 if (-not (Test-Path $envFile)) {
     Copy-Item "$PhysicalPath\.env.example" $envFile -Force
-    Write-Warn ".env created from .env.example – YOU MUST EDIT IT:"
+    Write-Warn ".env created from .env.example - YOU MUST EDIT IT:"
     Write-Host "   >> notepad $envFile" -ForegroundColor Yellow
     Write-Host "   Set OPENAI_API_KEY and SECRET_KEY before first use."
 } else {
@@ -211,10 +211,10 @@ if ($envContent -match "FLASK_DEBUG=1") {
 }
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  7. FIX web.config PATHS
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "7/9 – Updating web.config paths"
+# =====================================================================
+Write-Step "7/9 - Updating web.config paths"
 
 $webConfigPath = "$PhysicalPath\web.config"
 $webConfig = Get-Content $webConfigPath -Raw
@@ -226,14 +226,14 @@ Set-Content -Path $webConfigPath -Value $webConfig -NoNewline
 Write-OK "web.config paths updated to $PhysicalPath"
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  8. CREATE IIS APPLICATION POOL + SITE
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "8/9 – Configuring IIS Application Pool and Site"
+# =====================================================================
+Write-Step "8/9 - Configuring IIS Application Pool and Site"
 
 Import-Module WebAdministration -ErrorAction SilentlyContinue
 
-# ── Application Pool ──────────────────────────────────────────────────
+# -- Application Pool --------------------------------------------------
 if (-not (Test-Path "IIS:\AppPools\$AppPoolName")) {
     New-WebAppPool -Name $AppPoolName | Out-Null
     Write-OK "Created application pool: $AppPoolName"
@@ -248,10 +248,10 @@ Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name "processModel.idleTimeout" -
 Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name "processModel.loadUserProfile" -Value $true
 Write-OK "App pool configured (No Managed Code, AlwaysRunning, No idle timeout)"
 
-# ── Site ──────────────────────────────────────────────────────────────
+# -- Site --------------------------------------------------------------
 $existingSite = Get-Website -Name $SiteName -ErrorAction SilentlyContinue
 if ($existingSite) {
-    Write-Warn "Site '$SiteName' already exists – updating binding"
+    Write-Warn "Site '$SiteName' already exists - updating binding"
     Set-ItemProperty "IIS:\Sites\$SiteName" -Name "physicalPath" -Value $PhysicalPath
     Set-ItemProperty "IIS:\Sites\$SiteName" -Name "applicationPool" -Value $AppPoolName
 } else {
@@ -275,10 +275,10 @@ if ($Port -eq 80) {
 }
 
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  9. SET PERMISSIONS + START
-# ═══════════════════════════════════════════════════════════════════════
-Write-Step "9/9 – Setting file permissions and starting the site"
+# =====================================================================
+Write-Step "9/9 - Setting file permissions and starting the site"
 
 # Grant IIS_IUSRS + the AppPool identity read/write on the app directory
 $acl = Get-Acl $PhysicalPath
@@ -296,9 +296,9 @@ Write-OK "File permissions set for IIS_IUSRS and AppPool identity"
 Start-Website -Name $SiteName -ErrorAction SilentlyContinue
 Write-OK "Site started"
 
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 #  DONE
-# ═══════════════════════════════════════════════════════════════════════
+# =====================================================================
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host "  DEPLOYMENT COMPLETE" -ForegroundColor Green

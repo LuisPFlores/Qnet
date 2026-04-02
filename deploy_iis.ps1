@@ -108,8 +108,12 @@ foreach ($feature in $features) {
         Write-OK "$feature (already enabled)"
     } else {
         Write-Host "   Installing $feature ..." -NoNewline
-        Enable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart -ErrorAction SilentlyContinue | Out-Null
-        Write-OK "done"
+        try {
+            Enable-WindowsOptionalFeature -Online -FeatureName $feature -All -NoRestart -ErrorAction Stop | Out-Null
+            Write-OK "done"
+        } catch {
+            Write-Warn "Failed to enable $feature : $_"
+        }
     }
 }
 

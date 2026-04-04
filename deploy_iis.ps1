@@ -186,9 +186,21 @@ if (-not (Test-Path "$venvPath\Scripts\python.exe")) {
 }
 
 Write-Host "   Installing Python dependencies (this may take a few minutes)..."
-& "$venvPath\Scripts\pip.exe" install --upgrade pip --quiet 2>&1 | Out-Null
-& "$venvPath\Scripts\pip.exe" install -r "$PhysicalPath\requirements.txt" --quiet 2>&1 | Out-Null
-Write-OK "Dependencies installed"
+# pip writes warnings/progress to stderr; temporarily allow that so PowerShell
+# does not treat stderr output from native commands as a terminating error.
+$prevEAP = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
+    & "$venvPath\Scripts\pip.exe" install --upgrade pip --quiet 2>&1 | Out-Null
+    & "$venvPath\Scripts\pip.exe" install -r "$PhysicalPath\requirements.txt" --quiet 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warn "pip exited with code $LASTEXITCODE - check dependency errors above"
+    } else {
+        Write-OK "Dependencies installed"
+    }
+} finally {
+    $ErrorActionPreference = $prevEAP
+}
 
 
 # =====================================================================

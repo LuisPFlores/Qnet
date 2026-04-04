@@ -26,7 +26,7 @@ param(
     [int]   $Port           = 80,
     [string]$HostHeader     = "",               # e.g. "qnet.yourdomain.com"
     [string]$PhysicalPath   = "C:\inetpub\QNetAgent",
-    [string]$PythonPath     = "C:\Python311\python.exe",
+    [string]$PythonPath     = "C:\Python313\python.exe",
     [string]$SourcePath     = $PSScriptRoot      # directory containing this script
 )
 

@@ -243,9 +243,25 @@ Write-OK "web.config paths updated to $PhysicalPath"
 
 
 # =====================================================================
-#  8. CREATE IIS APPLICATION POOL + SITE
+#  8. UNLOCK IIS CONFIGURATION SECTIONS + CREATE SITE
 # =====================================================================
 Write-Step "8/9 - Configuring IIS Application Pool and Site"
+
+# Unlock sections that are denied by default at the server level,
+# so that web.config can use them without a 500.19 error (0x80070021).
+$appcmd = "$env:SystemRoot\System32\inetsrv\appcmd.exe"
+$sectionsToUnlock = @(
+    "system.webServer/handlers",
+    "system.webServer/security/requestFiltering"
+)
+foreach ($section in $sectionsToUnlock) {
+    try {
+        & $appcmd unlock config -section:$section 2>&1 | Out-Null
+        Write-OK "Unlocked config section: $section"
+    } catch {
+        Write-Warn "Could not unlock $section (may already be unlocked)"
+    }
+}
 
 Import-Module WebAdministration -ErrorAction SilentlyContinue
 

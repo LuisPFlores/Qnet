@@ -13,8 +13,6 @@ data/*.db
 
 # Logs
 logs/
-
-# IIS
 *.log
 
 # IDE

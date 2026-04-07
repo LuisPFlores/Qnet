@@ -8,5 +8,3 @@ feedparser>=6.0
 python-dotenv>=1.0
 sqlalchemy>=2.0
 lxml>=5.0
-waitress>=3.0
-wfastcgi>=3.0

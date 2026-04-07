@@ -29,7 +29,7 @@ class IEEECollector(BaseCollector):
 
         if not config.IEEE_API_KEY:
             logger.info(
-                "IEEE API key not configured – using fallback web search approach"
+                "IEEE API key not configured -- using fallback web search approach"
             )
             results = self._collect_fallback()
         else:
@@ -46,48 +46,90 @@ class IEEECollector(BaseCollector):
                 params = {
                     "apikey": config.IEEE_API_KEY,
                     "querytext": keyword,
-                    "max_records": config.MAX_RESULTS_PER_SOURCE // 3,
-                    "sort_field": "article_date",
-                    "sort_order": "desc",
+                    "max_records": min(config.MAX_RESULTS_PER_SOURCE // 3, 200),
+                    "sort_field": "article_title",
+                    "sort_order": "asc",
                 }
+                logger.info(f"IEEE API request for '{keyword}': {IEEE_API_URL}")
                 resp = requests.get(
                     IEEE_API_URL, params=params, timeout=config.REQUEST_TIMEOUT
                 )
+
+                # Log the HTTP status for debugging
+                logger.info(f"IEEE API response status: {resp.status_code}")
+
+                if resp.status_code == 403:
+                    logger.error("IEEE API returned 403 Forbidden -- check your API key")
+                    continue
+                if resp.status_code == 429:
+                    logger.error("IEEE API returned 429 Too Many Requests -- rate limited")
+                    continue
+
                 resp.raise_for_status()
                 data = resp.json()
+
+                total_found = data.get("total_records", 0)
+                logger.info(f"IEEE API found {total_found} results for '{keyword}'")
 
                 for article in data.get("articles", []):
                     title = article.get("title", "")
                     if not title:
                         continue
 
-                    authors_list = article.get("authors", {}).get("authors", [])
+                    # Authors can be a list of dicts with 'full_name',
+                    # or nested under an 'authors' key
+                    authors_raw = article.get("authors", {})
+                    if isinstance(authors_raw, dict):
+                        authors_list = authors_raw.get("authors", [])
+                    elif isinstance(authors_raw, list):
+                        authors_list = authors_raw
+                    else:
+                        authors_list = []
                     authors = ", ".join(
-                        [a.get("full_name", "") for a in authors_list]
+                        [a.get("full_name", "") for a in authors_list if isinstance(a, dict)]
                     )
+
                     abstract = article.get("abstract", "")
                     url = article.get("html_url", "") or article.get("pdf_url", "")
+                    if not url:
+                        # Build URL from article_number if available
+                        art_num = article.get("article_number", "")
+                        if art_num:
+                            url = f"https://ieeexplore.ieee.org/document/{art_num}"
                     doi = article.get("doi", "")
 
-                    pub_date_str = article.get("publication_date", "")
+                    # publication_date format varies; try multiple patterns
                     pub_date = None
+                    pub_date_str = article.get("publication_date", "")
+                    pub_year = article.get("publication_year", "")
                     if pub_date_str:
-                        try:
-                            pub_date = datetime.strptime(
-                                pub_date_str, "%d %b. %Y"
-                            ).replace(tzinfo=timezone.utc)
-                        except ValueError:
+                        for fmt in [
+                            "%d %b. %Y",    # "15 Jan. 2024"
+                            "%d %B %Y",     # "15 January 2024"
+                            "%b. %Y",       # "Jan. 2024"
+                            "%B %Y",        # "January 2024"
+                            "%Y",           # "2024"
+                        ]:
                             try:
                                 pub_date = datetime.strptime(
-                                    pub_date_str, "%Y"
+                                    pub_date_str.strip(), fmt
                                 ).replace(tzinfo=timezone.utc)
+                                break
                             except ValueError:
-                                pass
+                                continue
+                    if not pub_date and pub_year:
+                        try:
+                            pub_date = datetime.strptime(
+                                str(pub_year).strip(), "%Y"
+                            ).replace(tzinfo=timezone.utc)
+                        except ValueError:
+                            pass
 
                     ext_id = f"ieee:{doi}" if doi else f"ieee:{hashlib.md5(title.encode()).hexdigest()}"
 
                     content_type = "paper"
-                    if "conference" in article.get("content_type", "").lower():
+                    ct = article.get("content_type", "").lower()
+                    if "conference" in ct or "conferences" in ct:
                         content_type = "conference"
 
                     results.append(
@@ -103,9 +145,17 @@ class IEEECollector(BaseCollector):
                             "raw_content": abstract,
                         }
                     )
-            except Exception as e:
-                logger.error(f"IEEE API error for keyword '{keyword}': {e}")
 
+                logger.info(f"IEEE API parsed {len(results)} articles so far")
+
+            except requests.exceptions.Timeout:
+                logger.error(f"IEEE API timeout for keyword '{keyword}'")
+            except requests.exceptions.ConnectionError as e:
+                logger.error(f"IEEE API connection error for '{keyword}': {e}")
+            except Exception as e:
+                logger.error(f"IEEE API error for keyword '{keyword}': {e}", exc_info=True)
+
+        logger.info(f"IEEE API collection complete: {len(results)} total articles")
         return results
 
     def _collect_fallback(self) -> List[Dict[str, Any]]:

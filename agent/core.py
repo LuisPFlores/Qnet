@@ -14,6 +14,7 @@ from collectors.scholar_collector import ScholarCollector
 from collectors.ieee_collector import IEEECollector
 from collectors.company_collector import CompanyCollector
 from collectors.university_collector import UniversityCollector
+from collectors.github_collector import GitHubCollector
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class QNetAgent:
             IEEECollector(session),
             CompanyCollector(session),
             UniversityCollector(session),
+            GitHubCollector(session),
         ]
 
     def collect_all(self) -> Dict[str, Any]:
@@ -75,6 +77,11 @@ class QNetAgent:
             for a in new_articles
             if a.source and a.source.source_type == "university"
         ]
+        new_simulators = [
+            self._article_to_dict(a)
+            for a in new_articles
+            if a.content_type == "software"
+        ]
 
         # Generate comprehensive summary
         summary = self.analyzer.generate_latest_summary(
@@ -96,6 +103,7 @@ class QNetAgent:
             "papers": new_papers,
             "company_news": new_company_news,
             "university_news": new_university_news,
+            "simulators": new_simulators,
             "hot_topics": hot_topics,
             "summary": summary,
             "analysis": analysis,

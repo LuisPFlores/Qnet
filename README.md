@@ -4,7 +4,7 @@ QNet Agent is an AI-powered research aggregator that automatically collects, ana
 
 ## Features
 
-- **Multi-source collection** — Gathers content from arXiv, Google Scholar, IEEE Xplore, company websites, and university research pages
+- **Multi-source collection** — Gathers content from arXiv, Google Scholar, IEEE Xplore, company websites, university research pages, and GitHub simulator repositories
 - **AI summarization** — Generates 2–3 sentence summaries for every collected article via OpenAI
 - **Topic extraction** — Automatically identifies 3–7 quantum networking topics per article
 - **Hot topic scoring** — Ranks topics using a composite formula: recency (40%), frequency (35%), and cross-source diversity (25%)
@@ -12,6 +12,7 @@ QNet Agent is an AI-powered research aggregator that automatically collects, ana
 - **Full-text search** — Search across titles, abstracts, and authors with source/content-type filters
 - **Deduplication** — Articles are deduplicated by external ID across all sources
 - **Snapshot history** — Periodic timestamped snapshots of topic rankings with AI-generated analysis
+- **Simulator catalog** — Tracks 8 quantum network simulators (NetSquid, SeQUeNCe, QuNetSim, SimulaQron, QuISP, SimQN, Interlin-q, QNE-ADK) with live GitHub stats, code examples, install commands, and use-case scenario mapping
 
 ## Architecture
 
@@ -23,7 +24,7 @@ Flask Web App (app.py)
    ┌────┼──────────────┐
    │    │              │
 Collectors        Analyzer          TopicEngine
-(5 sources)    (OpenAI GPT)     (scoring & trends)
+(6 sources)    (OpenAI GPT)     (scoring & trends)
    │    │              │
    └────┼──────────────┘
         │
@@ -40,8 +41,9 @@ Collectors        Analyzer          TopicEngine
 | **IEEE Xplore** | IEEE Xplore | Official API (fallback: web scraping) | Optional |
 | **Companies** | Industry websites | Web scraping (BeautifulSoup) | No |
 | **Universities** | Research group pages | Web scraping (BeautifulSoup) | No |
+| **GitHub Simulators** | GitHub repos | GitHub REST API | No (60 req/hr unauthenticated) |
 
-Pre-configured sources include 7 quantum networking companies (ID Quantique, Toshiba, Qubitekk, QuTech, Aliro, PsiQuantum, Xanadu) and 15 leading research universities worldwide (MIT, Caltech, TU Delft, Bristol, USTC, and more).
+Pre-configured sources include 7 quantum networking companies (ID Quantique, Toshiba, Qubitekk, QuTech, Aliro, PsiQuantum, Xanadu), 15 leading research universities worldwide (MIT, Caltech, TU Delft, Bristol, USTC, and more), and 8 quantum network simulators (NetSquid, SeQUeNCe, QuNetSim, SimulaQron, QuISP, SimQN, Interlin-q, QNE-ADK).
 
 ## Prerequisites
 
@@ -116,7 +118,7 @@ The app starts at **http://localhost:5000** by default.
   curl -X POST http://localhost:5000/api/fetch-latest
   ```
 
-This runs all five collectors, deduplicates results, stores them in the database, and triggers AI analysis (summarization, topic extraction, hot topic scoring).
+This runs all six collectors, deduplicates results, stores them in the database, and triggers AI analysis (summarization, topic extraction, hot topic scoring).
 
 ## Project Structure
 
@@ -158,6 +160,7 @@ Qnet/
 │   ├── hot_topics.html     # Topic rankings and trend analysis
 │   ├── universities.html   # Research group directory
 │   ├── sources.html        # Data source catalog
+│   ├── simulators.html     # Quantum network simulator catalog
 │   └── latest.html         # Results from the last collection run
 │
 └── static/
@@ -184,3 +187,4 @@ Qnet/
 | `GET` | `/api/stats` | Dashboard statistics as JSON |
 | `GET` | `/api/articles` | Articles as JSON (supports query filters) |
 | `GET` | `/api/hot-topics` | Hot topics as JSON |
+| `GET` | `/api/simulators` | Simulator catalog as JSON |

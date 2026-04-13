@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}Simulators - QNet Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-cpu me-2"></i>Quantum Network Simulators</h2>
+        <p class="text-muted">Catalog of quantum network simulation tools with live GitHub stats, code examples, and use-case mapping</p>
+    </div>
+</div>
+
+<!-- Summary stats row -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-dark border-secondary text-center">
+            <div class="card-body py-3">
+                <h3 class="text-info mb-0">{{ simulators|length }}</h3>
+                <small class="text-muted">Simulators Tracked</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-dark border-secondary text-center">
+            <div class="card-body py-3">
+                <h3 class="text-success mb-0">{{ simulators|selectattr('status', 'equalto', 'active')|list|length }}</h3>
+                <small class="text-muted">Actively Maintained</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-dark border-secondary text-center">
+            <div class="card-body py-3">
+                <h3 class="text-warning mb-0">{{ simulators|selectattr('status', 'equalto', 'stalled')|list|length }}</h3>
+                <small class="text-muted">Stalled / Dormant</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-dark border-secondary text-center">
+            <div class="card-body py-3">
+                <h3 class="text-info mb-0">{{ scenarios|length }}</h3>
+                <small class="text-muted">Use-Case Scenarios</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simulator cards -->
+<div class="row mb-5">
+    {% for sim in simulators %}
+    <div class="col-lg-6 mb-4">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    {% if sim.docs_url %}
+                    <a href="{{ sim.docs_url }}" target="_blank" class="text-info text-decoration-none">
+                        {{ sim.name }}
+                    </a>
+                    {% else %}
+                    {{ sim.name }}
+                    {% endif %}
+                </h5>
+                <div>
+                    {% if sim.status == 'active' %}
+                    <span class="badge bg-success">Active</span>
+                    {% elif sim.status == 'stalled' %}
+                    <span class="badge bg-warning text-dark">Stalled</span>
+                    {% else %}
+                    <span class="badge bg-danger">{{ sim.status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="small">{{ sim.description }}</p>
+
+                <!-- Metadata grid -->
+                <div class="row small mb-3">
+                    <div class="col-6 mb-2">
+                        <strong class="text-info">Language:</strong><br>
+                        {{ sim.language or 'N/A' }}
+                    </div>
+                    <div class="col-6 mb-2">
+                        <strong class="text-info">License:</strong><br>
+                        {{ sim.license or 'N/A' }}
+                    </div>
+                    <div class="col-6 mb-2">
+                        <strong class="text-info">Stars:</strong><br>
+                        {% if sim.github_stars %}
+                        <i class="bi bi-star-fill text-warning"></i> {{ sim.github_stars }}
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-6 mb-2">
+                        <strong class="text-info">Open Issues:</strong><br>
+                        {% if sim.github_open_issues %}
+                        {{ sim.github_open_issues }}
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </div>
+                    {% if sim.github_latest_release %}
+                    <div class="col-6 mb-2">
+                        <strong class="text-info">Latest Release:</strong><br>
+                        <span class="badge bg-secondary">{{ sim.github_latest_release }}</span>
+                    </div>
+                    {% endif %}
+                    {% if sim.github_last_commit %}
+                    <div class="col-6 mb-2">
+                        <strong class="text-info">Last Push:</strong><br>
+                        <small>{{ sim.github_last_commit[:10] }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Dependencies -->
+                {% if sim.dependencies %}
+                <div class="small mb-2">
+                    <strong class="text-info">Dependencies:</strong> {{ sim.dependencies }}
+                </div>
+                {% endif %}
+
+                <!-- Install command -->
+                {% if sim.install_command %}
+                <div class="mb-3">
+                    <strong class="text-info small">Install:</strong>
+                    <code class="d-block bg-black rounded p-2 mt-1 small" style="white-space: pre-wrap;">{{ sim.install_command }}</code>
+                </div>
+                {% endif %}
+
+                <!-- Scenarios -->
+                {% if sim.scenarios %}
+                <div class="mb-3">
+                    <strong class="text-info small">Use Cases:</strong><br>
+                    {% for scenario in sim.scenarios.split(',') %}
+                    <span class="badge bg-secondary me-1 mb-1">{{ scenario.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Links -->
+                <div class="d-flex gap-2 mb-3">
+                    {% if sim.github_url %}
+                    <a href="{{ sim.github_url }}" target="_blank" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-github me-1"></i>GitHub
+                    </a>
+                    {% endif %}
+                    {% if sim.docs_url %}
+                    <a href="{{ sim.docs_url }}" target="_blank" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-book me-1"></i>Docs
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Paper reference -->
+                {% if sim.paper_reference %}
+                <div class="small text-muted mb-3">
+                    <i class="bi bi-journal-text me-1"></i>{{ sim.paper_reference }}
+                </div>
+                {% endif %}
+
+                <!-- Expandable code example -->
+                {% if sim.example_code %}
+                <div class="mt-2">
+                    <button class="btn btn-outline-secondary btn-sm w-100" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#code-{{ loop.index }}"
+                            aria-expanded="false">
+                        <i class="bi bi-code-slash me-1"></i>Show Code Example
+                    </button>
+                    <div class="collapse mt-2" id="code-{{ loop.index }}">
+                        <pre class="bg-black rounded p-3 small" style="max-height: 400px; overflow-y: auto;"><code>{{ sim.example_code }}</code></pre>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Scenario Reference Matrix -->
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-dark border-secondary">
+                <h4 class="mb-0"><i class="bi bi-grid-3x3-gap me-2 text-info"></i>Scenario Reference Matrix</h4>
+                <small class="text-muted">Which simulators are recommended for each quantum networking use case</small>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 200px;">Scenario</th>
+                                <th>Description</th>
+                                <th style="min-width: 250px;">Recommended Simulators</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scenario in scenarios %}
+                            <tr>
+                                <td><strong class="text-info">{{ scenario.name }}</strong></td>
+                                <td class="small">{{ scenario.description }}</td>
+                                <td>
+                                    {% for sim_name in scenario.simulators %}
+                                    <span class="badge bg-secondary me-1 mb-1">{{ sim_name }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

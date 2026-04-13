@@ -142,3 +142,30 @@ class HotTopicSnapshot(Base):
 
     def __repr__(self):
         return f"<HotTopicSnapshot {self.generated_at}>"
+
+
+# ── Simulators ─────────────────────────────────────────────────────────
+class Simulator(Base):
+    __tablename__ = "simulators"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False, unique=True)
+    description = Column(Text, default="")
+    github_url = Column(Text, default="")
+    docs_url = Column(Text, default="")
+    language = Column(String(255), default="")  # e.g. "Python", "C++/OMNeT++"
+    dependencies = Column(Text, default="")
+    install_command = Column(Text, default="")  # e.g. "pip install qunetsim"
+    license = Column(String(100), default="")
+    example_code = Column(Text, default="")  # working code snippet
+    scenarios = Column(Text, default="")  # comma-separated use cases
+    status = Column(String(50), default="active")  # active, stalled, dead
+    github_stars = Column(Integer, default=0)
+    github_last_commit = Column(String(50), default="")  # ISO date string
+    github_open_issues = Column(Integer, default=0)
+    github_latest_release = Column(String(100), default="")
+    paper_reference = Column(Text, default="")  # academic citation
+    last_updated = Column(DateTime, default=_utcnow)
+
+    def __repr__(self):
+        return f"<Simulator {self.name}>"

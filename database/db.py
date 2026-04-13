@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 import config
-from database.models import Base, Source, University, Company
+from database.models import Base, Source, University, Company, Simulator
 
 
 def get_engine():
@@ -42,6 +42,8 @@ def _seed_initial_data(engine):
         _seed_universities(session)
         # ── Seed companies from config ─────────────────────────────────
         _seed_companies(session)
+        # ── Seed simulators from config ────────────────────────────────
+        _seed_simulators(session)
         session.commit()
     except Exception:
         session.rollback()
@@ -63,6 +65,11 @@ def _seed_sources(session):
             "name": "IEEE Xplore",
             "source_type": "ieee",
             "url": "https://ieeexplore.ieee.org/",
+        },
+        {
+            "name": "GitHub Simulators",
+            "source_type": "github",
+            "url": "https://github.com/",
         },
     ]
     for src_data in builtin_sources:
@@ -122,5 +129,28 @@ def _seed_companies(session):
                     name=comp_data["name"],
                     url=comp_data.get("url", ""),
                     description=comp_data.get("description", ""),
+                )
+            )
+
+
+def _seed_simulators(session):
+    """Seed quantum network simulator entries from config."""
+    for sim_data in config.SIMULATOR_SOURCES:
+        exists = session.query(Simulator).filter_by(name=sim_data["name"]).first()
+        if not exists:
+            session.add(
+                Simulator(
+                    name=sim_data["name"],
+                    description=sim_data.get("description", ""),
+                    github_url=sim_data.get("github_url", ""),
+                    docs_url=sim_data.get("docs_url", ""),
+                    language=sim_data.get("language", ""),
+                    dependencies=sim_data.get("dependencies", ""),
+                    install_command=sim_data.get("install_command", ""),
+                    license=sim_data.get("license", ""),
+                    example_code=sim_data.get("example_code", ""),
+                    scenarios=sim_data.get("scenarios", ""),
+                    status=sim_data.get("status", "active"),
+                    paper_reference=sim_data.get("paper_reference", ""),
                 )
             )

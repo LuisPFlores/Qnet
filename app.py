@@ -11,7 +11,7 @@ from flask import Flask, render_template, request, jsonify, flash, redirect, url
 
 import config
 from database.db import init_db, get_session, get_engine
-from database.models import Source, University, Company
+from database.models import Source, University, Company, Simulator
 from agent.core import QNetAgent
 from agent.topic_engine import TopicEngine
 
@@ -137,6 +137,20 @@ def latest():
     return render_template("latest.html", result=_last_fetch_result or None)
 
 
+@app.route("/simulators")
+def simulators():
+    """Quantum network simulator catalog page."""
+    session = get_session(engine)
+    try:
+        sim_list = session.query(Simulator).order_by(Simulator.name).all()
+        scenarios = config.QUANTUM_SCENARIOS
+        return render_template(
+            "simulators.html", simulators=sim_list, scenarios=scenarios
+        )
+    finally:
+        session.close()
+
+
 # ═══════════════════════════════════════════════════════════════════════
 #  API ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════
@@ -226,6 +240,39 @@ def api_hot_topics():
         topic_engine = TopicEngine(session)
         topics = topic_engine.get_hot_topics(limit=30)
         return jsonify(topics)
+    finally:
+        session.close()
+
+
+@app.route("/api/simulators")
+def api_simulators():
+    """Get simulator catalog as JSON."""
+    session = get_session(engine)
+    try:
+        sim_list = session.query(Simulator).order_by(Simulator.name).all()
+        result = []
+        for sim in sim_list:
+            result.append({
+                "id": sim.id,
+                "name": sim.name,
+                "description": sim.description,
+                "github_url": sim.github_url,
+                "docs_url": sim.docs_url,
+                "language": sim.language,
+                "dependencies": sim.dependencies,
+                "install_command": sim.install_command,
+                "license": sim.license,
+                "example_code": sim.example_code,
+                "scenarios": sim.scenarios,
+                "status": sim.status,
+                "github_stars": sim.github_stars,
+                "github_last_commit": sim.github_last_commit,
+                "github_open_issues": sim.github_open_issues,
+                "github_latest_release": sim.github_latest_release,
+                "paper_reference": sim.paper_reference,
+                "last_updated": sim.last_updated.isoformat() if sim.last_updated else "",
+            })
+        return jsonify(result)
     finally:
         session.close()
 

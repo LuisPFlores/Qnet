@@ -69,20 +69,20 @@ COMPANY_SOURCES = [
 # ── University research groups (quantum networking) ───────────────────
 UNIVERSITY_SOURCES = [
     {
-        "name": "MIT – Quantum Networks Center",
+        "name": "MIT – QPAI (Quantum Photonics & AI)",
         "country": "USA",
-        "url": "https://www.rle.mit.edu/qnc/",
-        "department": "Research Laboratory of Electronics",
-        "key_researchers": "Dirk Englund, Saikat Guha",
-        "focus_areas": "Quantum repeaters, entanglement distribution",
+        "url": "https://qp.mit.edu",
+        "department": "Research Laboratory of Electronics / EECS",
+        "key_researchers": "Dirk Englund",
+        "focus_areas": "Quantum repeaters, entanglement distribution, quantum photonics",
     },
     {
-        "name": "University of Chicago – Quantum Networks",
+        "name": "University of Chicago – Quantum Communication",
         "country": "USA",
-        "url": "https://pme.uchicago.edu/quantum-networks",
-        "department": "Pritzker School of Molecular Engineering",
-        "key_researchers": "David Awschalom, Hannes Bernien",
-        "focus_areas": "Quantum internet testbeds, quantum memory",
+        "url": "https://quantum.uchicago.edu/research-areas/quantum-communication",
+        "department": "Chicago Quantum Institute / Pritzker School of Molecular Engineering",
+        "key_researchers": "David Awschalom, Hannes Bernien, Tian Zhong",
+        "focus_areas": "Quantum internet testbeds, quantum memory, quantum networking",
     },
     {
         "name": "Caltech – Quantum Networks",
@@ -133,12 +133,12 @@ UNIVERSITY_SOURCES = [
         "focus_areas": "Satellite QKD, quantum repeaters, Micius satellite",
     },
     {
-        "name": "Tsinghua University – Quantum Info Center",
+        "name": "Tsinghua University – Center for Quantum Information",
         "country": "China",
-        "url": "https://iiis.tsinghua.edu.cn/en/quantum/",
-        "department": "IIIS",
+        "url": "https://iiis.tsinghua.edu.cn/en/CQI/Introduction.htm",
+        "department": "IIIS – Center for Quantum Information",
         "key_researchers": "Luming Duan",
-        "focus_areas": "Quantum communication, quantum computing",
+        "focus_areas": "Quantum communication, quantum computing, ion trap quantum simulation",
     },
     {
         "name": "University of Tokyo – Quantum Networks",
@@ -165,12 +165,12 @@ UNIVERSITY_SOURCES = [
         "focus_areas": "QKD, quantum networking, quantum repeaters",
     },
     {
-        "name": "University of Innsbruck – Quantum Optics",
+        "name": "University of Innsbruck – Distributed Quantum Systems",
         "country": "Austria",
-        "url": "https://www.uibk.ac.at/exphys/quantum/",
+        "url": "https://www.uibk.ac.at/en/exphys/research/dqs/",
         "department": "Institute for Experimental Physics",
         "key_researchers": "Rainer Blatt, Ben Lanyon",
-        "focus_areas": "Ion trap networks, long-distance entanglement",
+        "focus_areas": "Ion trap networks, long-distance entanglement, distributed quantum sensing",
     },
     {
         "name": "Sorbonne Université – LIP6 Quantum",

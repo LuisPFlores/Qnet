@@ -1,5 +1,7 @@
 """SQLAlchemy ORM models for the QNet Agent database."""
 
+import re
+import unicodedata
 from datetime import datetime, timezone
 from sqlalchemy import (
     Column,
@@ -71,9 +73,21 @@ class Article(Base):
     external_id = Column(
         String(255), nullable=True, unique=True
     )  # dedup key (arxiv id, doi, url hash)
+    normalized_title = Column(
+        String(500), nullable=True, index=True
+    )  # cross-source dedup key
 
     source = relationship("Source", back_populates="articles")
     topics = relationship("Topic", secondary=article_topics, back_populates="articles")
+
+    @staticmethod
+    def normalize_title(title: str) -> str:
+        """Return a canonical form of a title for cross-source deduplication."""
+        text = unicodedata.normalize("NFKD", title)
+        text = text.lower().strip()
+        text = re.sub(r"[^\w\s]", "", text)   # drop punctuation
+        text = re.sub(r"\s+", " ", text)       # collapse whitespace
+        return text
 
     def __repr__(self):
         return f"<Article {self.title[:60]}>"

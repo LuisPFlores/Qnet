@@ -49,8 +49,34 @@ class QNetAgent:
             source_counts[collector.SOURCE_TYPE] = len(items)
             all_items.extend(items)
 
+        # Cross-source dedup: keep the first occurrence per normalized title
+        # (collector order defines priority: arXiv > Scholar > IEEE > Company > Uni > GitHub)
+        seen_titles: dict[str, str] = {}  # normalized_title -> source_name
+        unique_items: list[Dict[str, Any]] = []
+        for item in all_items:
+            norm = Article.normalize_title(item.get("title", ""))
+            if not norm:
+                continue
+            if norm in seen_titles:
+                logger.info(
+                    "Cross-source duplicate skipped: '%s' from %s "
+                    "(already collected from %s)",
+                    item.get("title", "")[:80],
+                    item.get("source_name", "?"),
+                    seen_titles[norm],
+                )
+                continue
+            seen_titles[norm] = item.get("source_name", "")
+            unique_items.append(item)
+
+        logger.info(
+            "Cross-source dedup: %d items → %d unique",
+            len(all_items),
+            len(unique_items),
+        )
+
         # Deduplicate and store
-        new_articles = self._store_articles(all_items)
+        new_articles = self._store_articles(unique_items)
         logger.info(
             f"Collected {len(all_items)} total items, {len(new_articles)} new articles stored"
         )
@@ -119,12 +145,31 @@ class QNetAgent:
             if not ext_id:
                 continue
 
-            # Check for duplicate
+            # Check for same-source duplicate (external_id)
             existing = (
                 self.session.query(Article).filter_by(external_id=ext_id).first()
             )
             if existing:
                 continue
+
+            # Check for cross-source duplicate (normalized title already in DB)
+            norm_title = Article.normalize_title(item.get("title", ""))
+            if norm_title:
+                title_dup = (
+                    self.session.query(Article)
+                    .filter_by(normalized_title=norm_title)
+                    .first()
+                )
+                if title_dup:
+                    logger.info(
+                        "DB cross-source duplicate skipped: '%s' from %s "
+                        "(matches existing article id=%d from %s)",
+                        item.get("title", "")[:80],
+                        item.get("source_name", "?"),
+                        title_dup.id,
+                        title_dup.source.name if title_dup.source else "unknown",
+                    )
+                    continue
 
             # Find or create source
             source_name = item.get("source_name", "")
@@ -139,6 +184,7 @@ class QNetAgent:
                 published_date=item.get("published_date"),
                 content_type=item.get("content_type", "paper"),
                 external_id=ext_id,
+                normalized_title=norm_title,
                 raw_content=item.get("raw_content", ""),
                 fetched_at=datetime.now(timezone.utc),
             )

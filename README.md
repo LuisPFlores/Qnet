@@ -10,7 +10,8 @@ QNet Agent is an AI-powered research aggregator that automatically collects, ana
 - **Hot topic scoring** — Ranks topics using a composite formula: recency (40%), frequency (35%), and cross-source diversity (25%)
 - **Trend detection** — Classifies topics as rising, declining, new, or stable over a 30-day window
 - **Full-text search** — Search across titles, abstracts, and authors with source/content-type filters
-- **Deduplication** — Articles are deduplicated by external ID across all sources
+- **Deduplication** — Two-layer dedup: same-source (external ID) and cross-source (normalized title matching) ensures articles appearing in multiple sources are stored only once
+- **Automatic periodic fetching** — Background scheduler runs collection automatically at a configurable interval (default: every 6 hours)
 - **Snapshot history** — Periodic timestamped snapshots of topic rankings with AI-generated analysis
 - **Simulator catalog** — Tracks 8 quantum network simulators (NetSquid, SeQUeNCe, QuNetSim, SimulaQron, QuISP, SimQN, Interlin-q, QNE-ADK) with live GitHub stats, code examples, install commands, and use-case scenario mapping
 
@@ -100,6 +101,7 @@ All settings are loaded from environment variables with sensible defaults. See `
 | `IEEE_API_KEY` | *(empty)* | IEEE Xplore API key; falls back to web scraping if absent |
 | `MAX_RESULTS_PER_SOURCE` | `20` | Maximum articles fetched per source per run |
 | `REQUEST_TIMEOUT` | `30` | HTTP request timeout in seconds |
+| `FETCH_INTERVAL_HOURS` | `6` | How often (in hours) the background scheduler automatically fetches new articles |
 
 ## Running the Application
 
@@ -111,6 +113,7 @@ The app starts at **http://localhost:5000** by default.
 
 ### Triggering a collection run
 
+- **Automatic** — A background scheduler fetches new content every `FETCH_INTERVAL_HOURS` hours (default: 6). No manual action required.
 - **From the UI** — Click the **"Give me the last content"** button on the dashboard.
 - **Programmatically** — Send a POST request:
 

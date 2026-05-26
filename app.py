@@ -7,7 +7,9 @@ Usage:  python app.py
 
 import logging
 import json
+import atexit
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import config
 from database.db import init_db, get_session, get_engine
@@ -32,6 +34,45 @@ init_db(engine)
 
 # ── Store last fetch result in memory for display ──────────────────────
 _last_fetch_result = {}
+
+
+# ── Scheduled fetch job ────────────────────────────────────────────────
+def _scheduled_fetch():
+    """Background job: run full collection pipeline."""
+    logger.info("=== SCHEDULED FETCH: Starting automatic collection ===")
+    session = get_session(engine)
+    try:
+        agent = QNetAgent(session)
+        result = agent.collect_all()
+        session.commit()
+        global _last_fetch_result
+        _last_fetch_result = result
+        logger.info(
+            "=== SCHEDULED FETCH: Complete. %d new articles. ===",
+            result["new_articles"],
+        )
+    except Exception as e:
+        session.rollback()
+        logger.error("Scheduled fetch failed: %s", e, exc_info=True)
+    finally:
+        session.close()
+
+
+# ── Background scheduler ──────────────────────────────────────────────
+scheduler = BackgroundScheduler(daemon=True)
+scheduler.add_job(
+    _scheduled_fetch,
+    "interval",
+    hours=config.FETCH_INTERVAL_HOURS,
+    id="periodic_fetch",
+    name="Periodic article collection",
+    misfire_grace_time=3600,
+)
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown(wait=False))
+logger.info(
+    "Scheduler started: fetching every %.1f hour(s)", config.FETCH_INTERVAL_HOURS
+)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -288,4 +329,7 @@ if __name__ == "__main__":
     logger.info(
         f"OpenAI API key configured: {'Yes' if config.OPENAI_API_KEY else 'No'}"
     )
-    app.run(debug=config.DEBUG, host="0.0.0.0", port=5000)
+    logger.info(
+        f"Auto-fetch interval: {config.FETCH_INTERVAL_HOURS}h"
+    )
+    app.run(debug=False, host="0.0.0.0", port=5000)

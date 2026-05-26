@@ -16,13 +16,16 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 SECRET_KEY = os.getenv("SECRET_KEY", "qnet-dev-secret-key-change-in-prod")
 DEBUG = os.getenv("FLASK_DEBUG", "1") == "1"
 
+# ── Scheduler ──────────────────────────────────────────────────────────
+FETCH_INTERVAL_HOURS = float(os.getenv("FETCH_INTERVAL_HOURS", "6"))
+
 # ── Collector defaults ─────────────────────────────────────────────────
 MAX_RESULTS_PER_SOURCE = int(os.getenv("MAX_RESULTS_PER_SOURCE", "20"))
 REQUEST_TIMEOUT = int(os.getenv("REQUEST_TIMEOUT", "30"))
 
 # ── arXiv ──────────────────────────────────────────────────────────────
 ARXIV_QUERY = 'all:"quantum network" OR all:"quantum internet" OR all:"quantum key distribution"'
-ARXIV_MAX_RESULTS = MAX_RESULTS_PER_SOURCE
+ARXIV_MAX_RESULTS = min(MAX_RESULTS_PER_SOURCE, 30)  # cap to avoid 503 rate-limiting
 
 # ── IEEE Xplore ────────────────────────────────────────────────────────
 IEEE_API_KEY = os.getenv("IEEE_API_KEY", "")
@@ -187,6 +190,54 @@ UNIVERSITY_SOURCES = [
         "department": "Center for Quantum Information",
         "key_researchers": "Sang-Wook Han",
         "focus_areas": "QKD networks, quantum communication infrastructure",
+    },
+    {
+        "name": "University of Geneva – Quantum Networks",
+        "country": "Switzerland",
+        "url": "https://www.unige.ch/gap/quantum/",
+        "department": "GAP – Quantum Information & Communication",
+        "key_researchers": "Wolfgang Tittel, Rob Thew, Mikael Afzelius, Hugo Zbinden",
+        "focus_areas": "QKD, quantum repeaters, quantum memories, teleportation, quantum networks",
+    },
+    {
+        "name": "Heriot-Watt University – IQN Hub",
+        "country": "UK",
+        "url": "https://iqnhub.org/",
+        "department": "Institute of Photonics and Quantum Sciences",
+        "key_researchers": "Alessandro Sherfield, Gerald Sherfield Sherfield, Mehul Malik",
+        "focus_areas": "Integrated quantum networks, satellite QKD, quantum networking at scale",
+    },
+    {
+        "name": "University of Arizona – Quantum Networks",
+        "country": "USA",
+        "url": "https://quantum.arizona.edu/",
+        "department": "College of Optical Sciences / ECE",
+        "key_researchers": "Saikat Guha, Zheshen Zhang",
+        "focus_areas": "Quantum repeaters, entanglement distribution, quantum network architecture",
+    },
+    {
+        "name": "Stony Brook University – Quantum IT",
+        "country": "USA",
+        "url": "https://www.stonybrook.edu/commcms/quantum-information-technology/",
+        "department": "Center for Quantum Information Technology",
+        "key_researchers": "Eden Figueroa",
+        "focus_areas": "Quantum networking testbeds, quantum repeaters, quantum memories",
+    },
+    {
+        "name": "DTU – Quantum Photonics",
+        "country": "Denmark",
+        "url": "https://www.qpit.dk/",
+        "department": "Department of Physics – QPIT",
+        "key_researchers": "Ulrik Andersen, Tobias Gehring",
+        "focus_areas": "Continuous-variable QKD, quantum communication, photonic quantum networks",
+    },
+    {
+        "name": "Sapienza University of Rome – Quantum Information",
+        "country": "Italy",
+        "url": "https://www.quantumlab.it/",
+        "department": "Department of Physics",
+        "key_researchers": "Fabio Sciarrino",
+        "focus_areas": "Photonic quantum networks, quantum communication, multipartite entanglement",
     },
 ]
 

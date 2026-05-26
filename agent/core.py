@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Optional
 
 from sqlalchemy.orm import Session
 
-from database.models import Article, Source
+from database.models import Article, Source, University, Company, Simulator
 from agent.analyzer import Analyzer
 from agent.topic_engine import TopicEngine
 from collectors.arxiv_collector import ArxivCollector
@@ -265,8 +265,18 @@ class QNetAgent:
             .all()
         )
 
+        # Tracked source counts
+        tracked_universities = self.session.query(University).count()
+        tracked_companies = self.session.query(Company).count()
+        tracked_simulators = self.session.query(Simulator).count()
+
         return {
             "article_counts": article_counts,
+            "tracked_sources": {
+                "universities": tracked_universities,
+                "companies": tracked_companies,
+                "simulators": tracked_simulators,
+            },
             "hot_topics": hot_topics,
             "latest_snapshot": latest_snapshot,
             "trends": trends[:10],

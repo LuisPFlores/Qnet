@@ -124,6 +124,73 @@ The app starts at **http://localhost:5000** by default.
 
 This runs all six collectors, deduplicates results, stores them in the database, and triggers AI analysis (summarization, topic extraction, hot topic scoring).
 
+## Distributed Computing Research
+
+The **Research Discovery** section extends QNet beyond quantum networking and includes a dedicated **Distributed Computing** research area. Open:
+
+```text
+http://localhost:5000/research-discovery?area=distributed-computing
+```
+
+The distributed-computing search covers topics such as:
+
+- Distributed systems and algorithms
+- Cloud and serverless computing
+- Edge computing
+- Consensus protocols and fault tolerance
+- Peer-to-peer systems
+- Distributed databases, storage, and data processing
+- Large-scale networking and computing infrastructure
+
+### Running a distributed-computing search
+
+1. Open **Research Discovery** from the navigation bar.
+2. Select **Distributed Computing**.
+3. Optionally enter a narrower topic, such as `Byzantine consensus`, `edge computing`, or `distributed databases`.
+4. Click **Search live**.
+
+The app searches arXiv, Google Scholar, IEEE Xplore, and curated university and company pages. Results are normalized, deduplicated, saved to SQLite, and summarized with OpenAI when an API key is configured. A standard HTML form fallback allows the search to run even when browser JavaScript is unavailable.
+
+Saved discovery results remain separate from the quantum-networking hot-topic rankings, so distributed-computing content does not change the specialized QNet trend scores.
+
+### Distributed-computing organizations
+
+The section includes a curated directory of universities and companies working on distributed systems. Initial entries include MIT CSAIL, UC Berkeley, Stanford, Carnegie Mellon, Cornell, EPFL, ETH Zurich, Cambridge, AWS, Google Cloud, Microsoft Research, Cloudflare, Confluent, Cockroach Labs, Databricks, and Red Hat.
+
+### API example
+
+Run and save a general distributed-computing search:
+
+```bash
+curl -X POST http://localhost:5000/api/research-discovery \
+  -H "Content-Type: application/json" \
+  -d '{"research_area":"distributed-computing","search_query":"distributed systems"}'
+```
+
+The `search_query` value is optional. The response includes the number of collected, matched, and newly saved articles, plus counts for each source type:
+
+```json
+{
+  "success": true,
+  "result": {
+    "research_area": "distributed-computing",
+    "search_query": "distributed systems",
+    "total_collected": 138,
+    "matched_articles": 127,
+    "new_articles": 127,
+    "source_counts": {
+      "arxiv": 20,
+      "scholar": 18,
+      "ieee": 0,
+      "company": 97,
+      "university": 3
+    }
+  }
+}
+```
+
+Counts vary between runs because external sources can change, rate-limit requests, or return no results.
+
 ## Project Structure
 
 ```
@@ -165,7 +232,8 @@ Qnet/
 │   ├── universities.html   # Research group directory
 │   ├── sources.html        # Data source catalog
 │   ├── simulators.html     # Quantum network simulator catalog
-│   └── latest.html         # Results from the last collection run
+│   ├── latest.html         # Results from the last collection run
+│   └── research_discovery.html # Quantum/distributed computing discovery
 │
 └── static/
     ├── css/style.css       # Stylesheet

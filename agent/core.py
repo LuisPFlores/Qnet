@@ -6,7 +6,15 @@ from typing import List, Dict, Any, Optional
 
 from sqlalchemy.orm import Session
 
-from database.models import Article, Source, University, Company, Simulator
+import config
+from database.models import (
+    Article,
+    Source,
+    University,
+    Company,
+    Simulator,
+    DiscoveryResult,
+)
 from agent.analyzer import Analyzer
 from agent.topic_engine import TopicEngine
 from collectors.arxiv_collector import ArxivCollector
@@ -136,6 +144,111 @@ class QNetAgent:
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
+    def discover(self, research_area: str, search_query: str = "") -> Dict[str, Any]:
+        """Search external sources for a broader research area and persist results."""
+        if research_area not in config.RESEARCH_AREAS:
+            raise ValueError(f"Unsupported research area: {research_area}")
+
+        area_config = config.RESEARCH_AREAS[research_area]
+        search_query = search_query.strip()
+        keywords = list(area_config["keywords"])
+        if search_query:
+            keywords.insert(0, search_query)
+
+        arxiv_query = area_config["arxiv_query"]
+        if search_query:
+            safe_query = search_query.replace('"', "")
+            arxiv_query = f'({arxiv_query}) AND all:"{safe_query}"'
+
+        collectors = [
+            ArxivCollector(self.session, query=arxiv_query),
+            ScholarCollector(self.session, keywords=keywords[:3]),
+            IEEECollector(self.session, keywords=keywords[:3]),
+            CompanyCollector(self.session, sources=area_config["companies"]),
+            UniversityCollector(
+                self.session,
+                sources=area_config["universities"],
+                keywords=keywords,
+            ),
+        ]
+
+        collected_items = []
+        source_counts = {}
+        for collector in collectors:
+            items = collector.collect_safe()
+            source_counts[collector.SOURCE_TYPE] = len(items)
+            collected_items.extend(items)
+
+        unique_items = {}
+        for item in collected_items:
+            normalized_title = Article.normalize_title(item.get("title", ""))
+            if normalized_title and normalized_title not in unique_items:
+                unique_items[normalized_title] = item
+
+        items = list(unique_items.values())
+        new_articles = self._store_articles(items)
+        self._summarize_discovery_articles(new_articles)
+
+        discovered_articles = []
+        for item in items:
+            article = None
+            external_id = item.get("external_id", "")
+            if external_id:
+                article = self.session.query(Article).filter_by(
+                    external_id=external_id
+                ).first()
+            if not article:
+                normalized_title = Article.normalize_title(item.get("title", ""))
+                article = self.session.query(Article).filter_by(
+                    normalized_title=normalized_title
+                ).first()
+            if not article:
+                continue
+
+            mapping = self.session.query(DiscoveryResult).filter_by(
+                article_id=article.id, research_area=research_area
+            ).first()
+            if not mapping:
+                mapping = DiscoveryResult(
+                    article_id=article.id,
+                    research_area=research_area,
+                    search_query=search_query,
+                )
+                self.session.add(mapping)
+            elif search_query:
+                mapping.search_query = search_query
+                mapping.discovered_at = datetime.now(timezone.utc)
+            discovered_articles.append(article)
+
+        self.session.commit()
+        return {
+            "research_area": research_area,
+            "search_query": search_query,
+            "total_collected": len(collected_items),
+            "matched_articles": len(discovered_articles),
+            "new_articles": len(new_articles),
+            "source_counts": source_counts,
+        }
+
+    def get_discovery_articles(
+        self, research_area: str, search: str = "", limit: int = 100
+    ) -> List[Dict[str, Any]]:
+        """Return persisted discovery results for a research area."""
+        query = (
+            self.session.query(Article)
+            .join(DiscoveryResult, DiscoveryResult.article_id == Article.id)
+            .filter(DiscoveryResult.research_area == research_area)
+        )
+        if search:
+            search_term = f"%{search}%"
+            query = query.filter(
+                (Article.title.ilike(search_term))
+                | (Article.abstract.ilike(search_term))
+                | (Article.authors.ilike(search_term))
+            )
+        articles = query.order_by(DiscoveryResult.discovered_at.desc()).limit(limit).all()
+        return [self._article_to_dict(article) for article in articles]
+
     def _store_articles(self, items: List[Dict[str, Any]]) -> List[Article]:
         """Store collected items in the database, skipping duplicates."""
         new_articles = []
@@ -209,6 +322,16 @@ class QNetAgent:
                 for topic_name in topics:
                     self.topic_engine.update_topic(topic_name, article)
 
+        self.session.flush()
+
+    def _summarize_discovery_articles(self, articles: List[Article]):
+        """Summarize broader discovery content without changing network topic rankings."""
+        for article in articles:
+            content = article.abstract or article.raw_content
+            if content:
+                article.summary = self.analyzer.summarize_article(
+                    article.title, content, domain="computing research"
+                )
         self.session.flush()
 
     def get_all_articles(

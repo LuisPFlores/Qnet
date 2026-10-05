@@ -16,6 +16,10 @@ class ScholarCollector(BaseCollector):
 
     SOURCE_TYPE = "scholar"
 
+    def __init__(self, session, keywords=None):
+        super().__init__(session)
+        self.keywords = keywords or config.QUANTUM_NETWORK_KEYWORDS[:3]
+
     def collect(self) -> List[Dict[str, Any]]:
         source = self.get_or_create_source(
             "Google Scholar", "https://scholar.google.com/"
@@ -25,11 +29,12 @@ class ScholarCollector(BaseCollector):
         try:
             from scholarly import scholarly
 
-            for keyword in config.QUANTUM_NETWORK_KEYWORDS[:3]:
+            keyword_count = max(1, len(self.keywords))
+            for keyword in self.keywords:
                 search_query = scholarly.search_pubs(keyword)
                 count = 0
                 for paper in search_query:
-                    if count >= config.MAX_RESULTS_PER_SOURCE // 3:
+                    if count >= max(1, config.MAX_RESULTS_PER_SOURCE // keyword_count):
                         break
 
                     bib = paper.get("bib", {})

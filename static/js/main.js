@@ -61,6 +61,44 @@ function fetchLatest() {
         });
 }
 
+function runResearchDiscovery(event) {
+    event.preventDefault();
+
+    const area = document.getElementById('research-area').value;
+    const query = document.getElementById('discovery-query').value.trim();
+    const button = document.getElementById('btn-run-discovery');
+    const overlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+
+    button.disabled = true;
+    loadingText.textContent = 'Searching live research and organization sources...';
+    overlay.classList.remove('d-none');
+    overlay.style.display = 'flex';
+
+    fetch('/api/research-discovery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ research_area: area, search_query: query }),
+    })
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Research discovery failed');
+            }
+            const params = new URLSearchParams({ area });
+            if (query) {
+                params.set('search', query);
+            }
+            window.location.href = `/research-discovery?${params.toString()}`;
+        })
+        .catch(error => {
+            console.error('Research discovery error:', error);
+            alert(error.message);
+            overlay.classList.add('d-none');
+            button.disabled = false;
+        });
+}
+
 /**
  * Auto-dismiss flash alerts after 5 seconds
  */

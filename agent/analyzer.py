@@ -42,15 +42,17 @@ class Analyzer:
             logger.error(f"OpenAI API error: {e}")
             return ""
 
-    def summarize_article(self, title: str, abstract: str) -> str:
+    def summarize_article(
+        self, title: str, abstract: str, domain: str = "quantum networking"
+    ) -> str:
         """Generate a concise summary of an article."""
         if not abstract and not title:
             return ""
 
         system_prompt = (
-            "You are a scientific research assistant specializing in quantum networking. "
+            f"You are a scientific research assistant specializing in {domain}. "
             "Provide a concise 2-3 sentence summary of the given article that captures "
-            "the key contribution and relevance to quantum networking."
+            f"the key contribution and relevance to {domain}."
         )
         user_prompt = f"Title: {title}\n\nAbstract/Content: {abstract}"
 

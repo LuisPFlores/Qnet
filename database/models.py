@@ -14,6 +14,7 @@ from sqlalchemy import (
     ForeignKey,
     Table,
     create_engine,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -156,6 +157,37 @@ class HotTopicSnapshot(Base):
 
     def __repr__(self):
         return f"<HotTopicSnapshot {self.generated_at}>"
+
+
+class DiscoveryResult(Base):
+    __tablename__ = "discovery_results"
+    __table_args__ = (
+        UniqueConstraint("article_id", "research_area", name="uq_discovery_article_area"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    article_id = Column(Integer, ForeignKey("articles.id"), nullable=False)
+    research_area = Column(String(100), nullable=False, index=True)
+    search_query = Column(Text, default="")
+    discovered_at = Column(DateTime, default=_utcnow)
+
+    article = relationship("Article")
+
+
+class ResearchOrganization(Base):
+    __tablename__ = "research_organizations"
+    __table_args__ = (
+        UniqueConstraint("name", "research_area", name="uq_research_org_area"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    organization_type = Column(String(50), nullable=False)
+    research_area = Column(String(100), nullable=False, index=True)
+    country = Column(String(100), default="")
+    url = Column(Text, default="")
+    description = Column(Text, default="")
+    focus_areas = Column(Text, default="")
 
 
 # ── Simulators ─────────────────────────────────────────────────────────

@@ -20,6 +20,14 @@ class IEEECollector(BaseCollector):
 
     SOURCE_TYPE = "ieee"
 
+    def __init__(self, session, keywords=None):
+        super().__init__(session)
+        self.keywords = keywords or [
+            "quantum network",
+            "quantum key distribution",
+            "quantum internet",
+        ]
+
     def collect(self) -> List[Dict[str, Any]]:
         source = self.get_or_create_source(
             "IEEE Xplore", "https://ieeexplore.ieee.org/"
@@ -41,12 +49,15 @@ class IEEECollector(BaseCollector):
     def _collect_api(self) -> List[Dict[str, Any]]:
         """Collect using the official IEEE Xplore API."""
         results = []
-        for keyword in ["quantum network", "quantum key distribution", "quantum internet"]:
+        keyword_count = max(1, len(self.keywords))
+        for keyword in self.keywords:
             try:
                 params = {
                     "apikey": config.IEEE_API_KEY,
                     "querytext": keyword,
-                    "max_records": min(config.MAX_RESULTS_PER_SOURCE // 3, 200),
+                    "max_records": min(
+                        max(1, config.MAX_RESULTS_PER_SOURCE // keyword_count), 200
+                    ),
                     "sort_field": "article_title",
                     "sort_order": "asc",
                 }
@@ -165,7 +176,7 @@ class IEEECollector(BaseCollector):
         results = []
         search_url = "https://ieeexplore.ieee.org/search/searchresult.jsp"
 
-        for keyword in ["quantum network", "quantum key distribution"]:
+        for keyword in self.keywords:
             try:
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"

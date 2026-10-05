@@ -14,6 +14,7 @@ QNet Agent is an AI-powered research aggregator that automatically collects, ana
 - **Automatic periodic fetching** — Background scheduler runs collection automatically at a configurable interval (default: every 6 hours)
 - **Snapshot history** — Periodic timestamped snapshots of topic rankings with AI-generated analysis
 - **Simulator catalog** — Tracks 8 quantum network simulators (NetSquid, SeQUeNCe, QuNetSim, SimulaQron, QuISP, SimQN, Interlin-q, QNE-ADK) with live GitHub stats, code examples, install commands, and use-case scenario mapping
+- **Broader research discovery** — Runs live searches for quantum computing or distributed computing content, saves deduplicated results, and catalogs active universities and companies in each area
 
 ## Architecture
 
@@ -181,6 +182,7 @@ Qnet/
 | **Universities** | `/universities` | Directory of pre-configured research groups sorted by country |
 | **Sources** | `/sources` | Catalog of all configured data sources |
 | **Latest** | `/latest` | Summary and results from the most recent collection run |
+| **Research Discovery** | `/research-discovery` | Live and saved quantum-computing or distributed-computing research with organization directories |
 
 ## API Endpoints
 
@@ -191,3 +193,4 @@ Qnet/
 | `GET` | `/api/articles` | Articles as JSON (supports query filters) |
 | `GET` | `/api/hot-topics` | Hot topics as JSON |
 | `GET` | `/api/simulators` | Simulator catalog as JSON |
+| `POST` | `/api/research-discovery` | Search external sources for a selected research area and save results |

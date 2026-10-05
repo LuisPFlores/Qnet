@@ -28,10 +28,15 @@ class UniversityCollector(BaseCollector):
 
     SOURCE_TYPE = "university"
 
+    def __init__(self, session, sources=None, keywords=None):
+        super().__init__(session)
+        self.sources = sources or config.UNIVERSITY_SOURCES
+        self.keywords = keywords or config.QUANTUM_NETWORK_KEYWORDS
+
     def collect(self) -> List[Dict[str, Any]]:
         all_results = []
 
-        for uni in config.UNIVERSITY_SOURCES:
+        for uni in self.sources:
             source = self.get_or_create_source(uni["name"], uni["url"])
             try:
                 items = self._scrape_university(uni)
@@ -98,7 +103,7 @@ class UniversityCollector(BaseCollector):
             # Filter for quantum-related content
             full_text = item_el.get_text(strip=True).lower()
             is_relevant = any(
-                kw.lower() in full_text for kw in config.QUANTUM_NETWORK_KEYWORDS
+                kw.lower() in full_text for kw in self.keywords
             )
             if not is_relevant and len(items_found) > 10:
                 # Only filter if there are many items; small pages may all be relevant

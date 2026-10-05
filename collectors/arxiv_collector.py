@@ -17,6 +17,11 @@ class ArxivCollector(BaseCollector):
 
     SOURCE_TYPE = "arxiv"
 
+    def __init__(self, session, query=None, max_results=None):
+        super().__init__(session)
+        self.query = query or config.ARXIV_QUERY
+        self.max_results = max_results or config.ARXIV_MAX_RESULTS
+
     def collect(self) -> List[Dict[str, Any]]:
         source = self.get_or_create_source("arXiv", "https://arxiv.org/")
 
@@ -30,8 +35,8 @@ class ArxivCollector(BaseCollector):
             num_retries=5,
         )
         search = arxiv.Search(
-            query=config.ARXIV_QUERY,
-            max_results=config.ARXIV_MAX_RESULTS,
+            query=self.query,
+            max_results=self.max_results,
             sort_by=arxiv.SortCriterion.SubmittedDate,
             sort_order=arxiv.SortOrder.Descending,
         )

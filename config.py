@@ -256,6 +256,138 @@ QUANTUM_NETWORK_KEYWORDS = [
     "quantum network simulator",
 ]
 
+# ── Broader computing research discovery ──────────────────────────────
+RESEARCH_AREAS = {
+    "quantum-computing": {
+        "label": "Quantum Computing",
+        "description": "Hardware, algorithms, error correction, software, and applications.",
+        "keywords": [
+            "quantum computing",
+            "quantum computer",
+            "quantum algorithm",
+            "quantum error correction",
+            "fault tolerant quantum computing",
+            "quantum processor",
+        ],
+        "arxiv_query": (
+            'all:"quantum computing" OR all:"quantum algorithm" OR '
+            'all:"quantum error correction" OR all:"quantum processor"'
+        ),
+        "universities": [
+            {
+                "name": "MIT Center for Quantum Engineering",
+                "country": "USA",
+                "url": "https://cqe.mit.edu/",
+                "key_researchers": "",
+                "description": "Interdisciplinary quantum science and engineering research.",
+                "focus_areas": "Quantum processors, algorithms, sensing, quantum engineering",
+            },
+            {
+                "name": "Harvard Quantum Initiative",
+                "country": "USA",
+                "url": "https://quantum.harvard.edu/",
+                "key_researchers": "",
+                "description": "Quantum science research spanning physics, engineering, and computation.",
+                "focus_areas": "Quantum simulation, algorithms, hardware, quantum materials",
+            },
+            {
+                "name": "University of Chicago Quantum Exchange",
+                "country": "USA",
+                "url": "https://chicagoquantum.org/",
+                "key_researchers": "",
+                "description": "Regional hub for quantum information science and engineering.",
+                "focus_areas": "Quantum computing, communication, sensing, workforce development",
+            },
+            {
+                "name": "University of Waterloo Institute for Quantum Computing",
+                "country": "Canada",
+                "url": "https://uwaterloo.ca/institute-for-quantum-computing/",
+                "key_researchers": "",
+                "description": "Research institute covering the theory and implementation of quantum technologies.",
+                "focus_areas": "Quantum algorithms, cryptography, hardware, communication",
+            },
+            {
+                "name": "University of Oxford Quantum Group",
+                "country": "UK",
+                "url": "https://www.physics.ox.ac.uk/research/group/quantum-information-and-technologies",
+                "key_researchers": "",
+                "description": "Quantum information, computation, and technology research.",
+                "focus_areas": "Ion traps, quantum algorithms, error correction, photonics",
+            },
+            {
+                "name": "QuTech at TU Delft",
+                "country": "Netherlands",
+                "url": "https://qutech.nl/research-engineering/quantum-computing/",
+                "key_researchers": "",
+                "description": "Research and engineering institute for scalable quantum technologies.",
+                "focus_areas": "Quantum processors, control, architecture, quantum internet",
+            },
+            {
+                "name": "University of Science and Technology of China",
+                "country": "China",
+                "url": "https://quantum.ustc.edu.cn/web/en",
+                "key_researchers": "",
+                "description": "Experimental and theoretical quantum information research.",
+                "focus_areas": "Photonic computing, superconducting processors, quantum communication",
+            },
+            {
+                "name": "National University of Singapore Centre for Quantum Technologies",
+                "country": "Singapore",
+                "url": "https://www.quantumlah.org/",
+                "key_researchers": "",
+                "description": "Research centre for quantum physics and quantum information technologies.",
+                "focus_areas": "Quantum information, computation, cryptography, sensing",
+            },
+        ],
+        "companies": [
+            {"name": "IBM Quantum", "url": "https://www.ibm.com/quantum", "country": "USA", "description": "Develops superconducting quantum systems and the Qiskit software ecosystem.", "focus_areas": "Quantum hardware, Qiskit, error mitigation, cloud quantum computing"},
+            {"name": "Google Quantum AI", "url": "https://quantumai.google/", "country": "USA", "description": "Researches scalable quantum processors, algorithms, and error correction.", "focus_areas": "Superconducting processors, error correction, algorithms"},
+            {"name": "Microsoft Azure Quantum", "url": "https://azure.microsoft.com/products/quantum", "country": "USA", "description": "Cloud quantum platform and quantum hardware and software research.", "focus_areas": "Quantum cloud, resource estimation, quantum hardware"},
+            {"name": "Quantinuum", "url": "https://www.quantinuum.com/", "country": "USA / UK", "description": "Builds trapped-ion quantum computers and quantum software.", "focus_areas": "Trapped ions, quantum software, cybersecurity, chemistry"},
+            {"name": "IonQ", "url": "https://ionq.com/", "country": "USA", "description": "Develops trapped-ion quantum computers and cloud access.", "focus_areas": "Trapped-ion hardware, quantum applications, cloud access"},
+            {"name": "Rigetti Computing", "url": "https://www.rigetti.com/", "country": "USA", "description": "Develops superconducting quantum processors and cloud services.", "focus_areas": "Superconducting processors, hybrid computing, quantum cloud"},
+            {"name": "D-Wave", "url": "https://www.dwavequantum.com/", "country": "Canada", "description": "Develops quantum annealing systems and hybrid optimization software.", "focus_areas": "Quantum annealing, optimization, hybrid solvers"},
+            {"name": "PsiQuantum", "url": "https://www.psiquantum.com/", "country": "USA", "description": "Develops fault-tolerant photonic quantum computing systems.", "focus_areas": "Photonics, fault tolerance, silicon manufacturing"},
+        ],
+    },
+    "distributed-computing": {
+        "label": "Distributed Computing",
+        "description": "Cloud, edge, peer-to-peer, consensus, and large-scale distributed systems.",
+        "keywords": [
+            "distributed computing",
+            "distributed systems",
+            "cloud computing",
+            "edge computing",
+            "consensus protocol",
+            "peer to peer systems",
+        ],
+        "arxiv_query": (
+            'all:"distributed computing" OR all:"distributed systems" OR '
+            'all:"edge computing" OR all:"consensus protocol"'
+        ),
+        "universities": [
+            {"name": "MIT Distributed Systems", "country": "USA", "url": "https://pdos.csail.mit.edu/", "key_researchers": "", "description": "CSAIL group researching operating and distributed systems.", "focus_areas": "Distributed systems, operating systems, networks, security"},
+            {"name": "UC Berkeley Sky Computing Lab", "country": "USA", "url": "https://sky.cs.berkeley.edu/", "key_researchers": "", "description": "Researches an open and interoperable evolution of cloud computing.", "focus_areas": "Cloud computing, data systems, machine learning infrastructure"},
+            {"name": "Stanford Distributed Systems Group", "country": "USA", "url": "https://cs.stanford.edu/research/systems", "key_researchers": "", "description": "Systems research across distributed computing, networking, and storage.", "focus_areas": "Distributed systems, databases, networking, storage"},
+            {"name": "Carnegie Mellon Parallel Data Laboratory", "country": "USA", "url": "https://www.pdl.cmu.edu/", "key_researchers": "", "description": "Research laboratory focused on data-intensive storage and systems.", "focus_areas": "Storage systems, distributed systems, cloud infrastructure"},
+            {"name": "Cornell Systems and Networking", "country": "USA", "url": "https://www.cs.cornell.edu/research/systems", "key_researchers": "", "description": "Research in distributed systems, cloud computing, and networking.", "focus_areas": "Distributed systems, cloud, networking, reliability"},
+            {"name": "EPFL Distributed Computing Laboratory", "country": "Switzerland", "url": "https://www.epfl.ch/labs/dcl/", "key_researchers": "", "description": "Research on dependable and secure distributed computing.", "focus_areas": "Fault tolerance, consensus, distributed algorithms, security"},
+            {"name": "ETH Zurich Systems Group", "country": "Switzerland", "url": "https://systems.ethz.ch/", "key_researchers": "", "description": "Computer systems research from hardware through distributed software.", "focus_areas": "Distributed systems, networks, cloud, data processing"},
+            {"name": "University of Cambridge Systems Research Group", "country": "UK", "url": "https://www.cl.cam.ac.uk/research/srg/", "key_researchers": "", "description": "Research in networked and distributed computer systems.", "focus_areas": "Distributed systems, networking, operating systems, security"},
+        ],
+        "companies": [
+            {"name": "Amazon Web Services", "url": "https://www.amazon.science/tag/distributed-systems", "country": "USA", "description": "Develops global cloud infrastructure and distributed services.", "focus_areas": "Cloud computing, storage, databases, serverless, edge"},
+            {"name": "Google Cloud", "url": "https://research.google/research-areas/distributed-systems-and-parallel-computing/", "country": "USA", "description": "Researches and operates planet-scale distributed systems.", "focus_areas": "Distributed systems, cloud infrastructure, data processing"},
+            {"name": "Microsoft Research Systems", "url": "https://www.microsoft.com/research/research-area/systems-and-networking/", "country": "USA", "description": "Researches cloud, distributed, networked, and operating systems.", "focus_areas": "Cloud systems, distributed computing, networking, storage"},
+            {"name": "Cloudflare", "url": "https://research.cloudflare.com/", "country": "USA", "description": "Operates and researches a globally distributed edge network.", "focus_areas": "Edge computing, networking, security, distributed databases"},
+            {"name": "Confluent", "url": "https://www.confluent.io/", "country": "USA", "description": "Develops distributed event-streaming infrastructure around Apache Kafka.", "focus_areas": "Streaming, messaging, distributed data systems"},
+            {"name": "Cockroach Labs", "url": "https://www.cockroachlabs.com/", "country": "USA", "description": "Develops a resilient distributed SQL database.", "focus_areas": "Distributed databases, consensus, transactions, resilience"},
+            {"name": "Databricks", "url": "https://www.databricks.com/", "country": "USA", "description": "Develops distributed data and AI infrastructure based on Apache Spark.", "focus_areas": "Distributed data processing, lakehouse, Apache Spark"},
+            {"name": "Red Hat", "url": "https://research.redhat.com/", "country": "USA", "description": "Researches open-source cloud and distributed infrastructure.", "focus_areas": "Kubernetes, hybrid cloud, edge computing, distributed storage"},
+        ],
+    },
+}
+
 # ── Quantum network simulators ────────────────────────────────────────
 SIMULATOR_SOURCES = [
     {

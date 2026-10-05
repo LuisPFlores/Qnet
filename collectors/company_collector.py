@@ -28,10 +28,14 @@ class CompanyCollector(BaseCollector):
 
     SOURCE_TYPE = "company"
 
+    def __init__(self, session, sources=None):
+        super().__init__(session)
+        self.sources = sources or config.COMPANY_SOURCES
+
     def collect(self) -> List[Dict[str, Any]]:
         all_results = []
 
-        for company in config.COMPANY_SOURCES:
+        for company in self.sources:
             source = self.get_or_create_source(company["name"], company["url"])
             try:
                 items = self._scrape_company(company)

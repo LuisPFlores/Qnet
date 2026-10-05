@@ -13,7 +13,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 import config
 from database.db import init_db, get_session, get_engine
-from database.models import Source, University, Company, Simulator
+from database.models import (
+    Source,
+    University,
+    Company,
+    Simulator,
+    ResearchOrganization,
+)
 from agent.core import QNetAgent
 from agent.topic_engine import TopicEngine
 
@@ -192,6 +198,52 @@ def simulators():
         session.close()
 
 
+@app.route("/research-discovery", methods=["GET", "POST"])
+def research_discovery():
+    """Live and persisted discovery for broader computing research."""
+    values = request.form if request.method == "POST" else request.args
+    research_area = values.get("area", "quantum-computing").strip()
+    search = values.get("search", "").strip()[:200]
+    if research_area not in config.RESEARCH_AREAS:
+        research_area = "quantum-computing"
+
+    session = get_session(engine)
+    try:
+        agent = QNetAgent(session)
+        if request.method == "POST":
+            result = agent.discover(research_area, search)
+            flash(
+                f"Discovery complete: {result['matched_articles']} results found, "
+                f"{result['new_articles']} newly saved.",
+                "success",
+            )
+            return redirect(
+                url_for("research_discovery", area=research_area, search=search)
+            )
+
+        articles = agent.get_discovery_articles(research_area, search=search)
+        organizations = (
+            session.query(ResearchOrganization)
+            .filter_by(research_area=research_area)
+            .order_by(
+                ResearchOrganization.organization_type.desc(),
+                ResearchOrganization.country,
+                ResearchOrganization.name,
+            )
+            .all()
+        )
+        return render_template(
+            "research_discovery.html",
+            areas=config.RESEARCH_AREAS,
+            selected_area=research_area,
+            search=search,
+            articles=articles,
+            organizations=organizations,
+        )
+    finally:
+        session.close()
+
+
 # ═══════════════════════════════════════════════════════════════════════
 #  API ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════
@@ -227,6 +279,28 @@ def api_fetch_latest():
     except Exception as e:
         session.rollback()
         logger.error(f"Fetch latest failed: {e}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        session.close()
+
+
+@app.route("/api/research-discovery", methods=["POST"])
+def api_research_discovery():
+    """Run a live external search and persist its results."""
+    payload = request.get_json(silent=True) or {}
+    research_area = str(payload.get("research_area", "")).strip()
+    search_query = str(payload.get("search_query", "")).strip()[:200]
+
+    if research_area not in config.RESEARCH_AREAS:
+        return jsonify({"success": False, "error": "Invalid research area"}), 400
+
+    session = get_session(engine)
+    try:
+        result = QNetAgent(session).discover(research_area, search_query)
+        return jsonify({"success": True, "result": result})
+    except Exception as e:
+        session.rollback()
+        logger.error("Research discovery failed: %s", e, exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
     finally:
         session.close()

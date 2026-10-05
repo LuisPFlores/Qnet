@@ -5,7 +5,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 import config
-from database.models import Base, Source, University, Company, Simulator
+from database.models import (
+    Base,
+    Source,
+    University,
+    Company,
+    Simulator,
+    ResearchOrganization,
+)
 
 
 def get_engine():
@@ -44,6 +51,7 @@ def _seed_initial_data(engine):
         _seed_companies(session)
         # ── Seed simulators from config ────────────────────────────────
         _seed_simulators(session)
+        _seed_research_organizations(session)
         session.commit()
     except Exception:
         session.rollback()
@@ -154,3 +162,28 @@ def _seed_simulators(session):
                     paper_reference=sim_data.get("paper_reference", ""),
                 )
             )
+
+
+def _seed_research_organizations(session):
+    """Seed organizations used by the broader research discovery section."""
+    for area, area_config in config.RESEARCH_AREAS.items():
+        for organization_type in ("universities", "companies"):
+            for org in area_config[organization_type]:
+                singular_type = (
+                    "university" if organization_type == "universities" else "company"
+                )
+                exists = session.query(ResearchOrganization).filter_by(
+                    name=org["name"], research_area=area
+                ).first()
+                if not exists:
+                    session.add(
+                        ResearchOrganization(
+                            name=org["name"],
+                            organization_type=singular_type,
+                            research_area=area,
+                            country=org.get("country", ""),
+                            url=org.get("url", ""),
+                            description=org.get("description", ""),
+                            focus_areas=org.get("focus_areas", ""),
+                        )
+                    )

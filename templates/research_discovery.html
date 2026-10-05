@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Research Discovery - QNet Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-globe2 me-2"></i>Research Discovery</h2>
+        <p class="text-muted">
+            Search live academic, university, and company sources for quantum computing
+            and distributed computing content. Results are saved to the local catalog.
+        </p>
+    </div>
+</div>
+
+<div class="card bg-dark border-secondary mb-4">
+    <div class="card-body">
+        <form id="discovery-form" class="row g-3"
+              method="POST" action="{{ url_for('research_discovery') }}">
+            <div class="col-lg-4">
+                <label for="research-area" class="form-label">Research area</label>
+                <select id="research-area" name="area"
+                        class="form-select bg-dark text-light border-secondary">
+                    {% for area, details in areas.items() %}
+                    <option value="{{ area }}" {{ 'selected' if area == selected_area }}>
+                        {{ details.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <label for="discovery-query" class="form-label">Optional specific topic</label>
+                <input id="discovery-query" type="search"
+                       name="search"
+                       class="form-control bg-dark text-light border-secondary"
+                       value="{{ search }}" maxlength="200"
+                       placeholder="Examples: quantum error correction, Byzantine consensus">
+            </div>
+            <div class="col-lg-2 d-flex align-items-end">
+                <button id="btn-run-discovery" class="btn btn-info w-100" type="submit">
+                    <i class="bi bi-search me-1"></i>Search live
+                </button>
+            </div>
+        </form>
+        <div class="form-text mt-3">
+            Searches arXiv, Google Scholar, IEEE Xplore, and curated organization pages.
+            External sites may rate-limit or block automated requests.
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs border-secondary mb-4">
+    {% for area, details in areas.items() %}
+    <li class="nav-item">
+        <a class="nav-link {{ 'active text-dark bg-info border-info' if area == selected_area else 'text-info border-secondary' }}"
+           href="{{ url_for('research_discovery', area=area) }}">
+            {{ details.label }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="mb-1">Saved content</h4>
+                <p class="text-muted small mb-0">{{ areas[selected_area].description }}</p>
+            </div>
+            <span class="badge bg-info text-dark">{{ articles|length }} results</span>
+        </div>
+
+        {% for article in articles %}
+        <div class="card bg-dark border-secondary mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between gap-3">
+                    <h5 class="card-title">
+                        {% if article.url %}
+                        <a href="{{ article.url }}" target="_blank" rel="noopener"
+                           class="text-info text-decoration-none">{{ article.title }}</a>
+                        {% else %}
+                        {{ article.title }}
+                        {% endif %}
+                    </h5>
+                    <span class="badge bg-secondary align-self-start">{{ article.source }}</span>
+                </div>
+                {% if article.authors %}
+                <p class="small text-muted mb-2">{{ article.authors }}</p>
+                {% endif %}
+                {% if article.summary %}
+                <div class="alert alert-info bg-dark border-info py-2">
+                    <small><strong><i class="bi bi-robot me-1"></i>AI Summary:</strong>
+                    {{ article.summary }}</small>
+                </div>
+                {% endif %}
+                {% if article.abstract %}
+                <p class="small mb-0">
+                    {{ article.abstract[:600] }}{% if article.abstract|length > 600 %}...{% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center text-muted py-5">
+                <i class="bi bi-search display-3"></i>
+                <p class="mt-3 mb-0">No saved results for this area yet. Run a live search to begin.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-xl-4">
+        <h4 class="mb-3">Research organizations</h4>
+        {% for organization_type in ["university", "company"] %}
+        <div class="card bg-dark border-secondary mb-3">
+            <div class="card-header border-secondary">
+                <strong>
+                    <i class="bi {{ 'bi-mortarboard' if organization_type == 'university' else 'bi-building' }} me-2"></i>
+                    {{ "Universities" if organization_type == "university" else "Companies" }}
+                </strong>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for org in organizations if org.organization_type == organization_type %}
+                <div class="list-group-item bg-dark text-light border-secondary">
+                    <a href="{{ org.url }}" target="_blank" rel="noopener"
+                       class="text-info text-decoration-none fw-semibold">{{ org.name }}</a>
+                    {% if org.country %}<span class="text-muted small"> · {{ org.country }}</span>{% endif %}
+                    <p class="small mb-1 mt-1">{{ org.description }}</p>
+                    <p class="small text-muted mb-0">{{ org.focus_areas }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+if (typeof runResearchDiscovery === 'function') {
+    document.getElementById('discovery-form').addEventListener('submit', runResearchDiscovery);
+}
+</script>
+{% endblock %}

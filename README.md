@@ -1,4 +1,4 @@
-# QNet Agent — Quantum Network Intelligence Consolidator
+est# QNet Agent — Quantum Network Intelligence Consolidator
 
 QNet Agent is an AI-powered research aggregator that automatically collects, analyzes, and synthesizes quantum networking content from multiple academic and industry sources. It uses OpenAI to summarize articles, extract topics, detect hot trends, and generate narrative briefings — all served through a Flask web interface.
 

@@ -8,10 +8,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 DB_PATH = os.path.join(DATA_DIR, "qnet.db")
 
-# ── OpenAI ─────────────────────────────────────────────────────────────
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-
 # ── Flask ──────────────────────────────────────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "qnet-dev-secret-key-change-in-prod")
 DEBUG = os.getenv("FLASK_DEBUG", "1") == "1"

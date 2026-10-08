@@ -1,5 +1,4 @@
 flask>=3.0
-openai>=1.0
 arxiv>=2.0
 scholarly>=1.7
 beautifulsoup4>=4.12

@@ -1,18 +1,18 @@
 est# QNet Agent — Quantum Network Intelligence Consolidator
 
-QNet Agent is an AI-powered research aggregator that automatically collects, analyzes, and synthesizes quantum networking content from multiple academic and industry sources. It uses OpenAI to summarize articles, extract topics, detect hot trends, and generate narrative briefings — all served through a Flask web interface.
+QNet Agent is a research aggregator that automatically collects and analyzes quantum networking content from multiple academic and industry sources. It generates extractive summaries and identifies topics locally, without requiring an external AI service or API key.
 
 ## Features
 
 - **Multi-source collection** — Gathers content from arXiv, Google Scholar, IEEE Xplore, company websites, university research pages, and GitHub simulator repositories
-- **AI summarization** — Generates 2–3 sentence summaries for every collected article via OpenAI
-- **Topic extraction** — Automatically identifies 3–7 quantum networking topics per article
+- **Local summaries** — Produces concise extractive summaries from article abstracts and content
+- **Topic extraction** — Matches article text against a domain-specific quantum networking vocabulary
 - **Hot topic scoring** — Ranks topics using a composite formula: recency (40%), frequency (35%), and cross-source diversity (25%)
 - **Trend detection** — Classifies topics as rising, declining, new, or stable over a 30-day window
 - **Full-text search** — Search across titles, abstracts, and authors with source/content-type filters
 - **Deduplication** — Two-layer dedup: same-source (external ID) and cross-source (normalized title matching) ensures articles appearing in multiple sources are stored only once
 - **Automatic periodic fetching** — Background scheduler runs collection automatically at a configurable interval (default: every 6 hours)
-- **Snapshot history** — Periodic timestamped snapshots of topic rankings with AI-generated analysis
+- **Snapshot history** — Periodic timestamped snapshots of topic rankings with data-based reports
 - **Simulator catalog** — Tracks 8 quantum network simulators (NetSquid, SeQUeNCe, QuNetSim, SimulaQron, QuISP, SimQN, Interlin-q, QNE-ADK) with live GitHub stats, code examples, install commands, and use-case scenario mapping
 - **Broader research discovery** — Runs live searches for quantum computing or distributed computing content, saves deduplicated results, and catalogs active universities and companies in each area
 
@@ -26,7 +26,7 @@ Flask Web App (app.py)
    ┌────┼──────────────┐
    │    │              │
 Collectors        Analyzer          TopicEngine
-(6 sources)    (OpenAI GPT)     (scoring & trends)
+(6 sources)    (local analysis)  (scoring & trends)
    │    │              │
    └────┼──────────────┘
         │
@@ -50,7 +50,6 @@ Pre-configured sources include 7 quantum networking companies (ID Quantique, Tos
 ## Prerequisites
 
 - Python 3.10 or higher
-- An [OpenAI API key](https://platform.openai.com/api-keys)
 - *(Optional)* An [IEEE Xplore API key](https://developer.ieee.org/) for structured access to IEEE content
 
 ## Installation
@@ -80,10 +79,9 @@ Pre-configured sources include 7 quantum networking companies (ID Quantique, Tos
    pip install -r requirements.txt
    ```
 
-4. **Create a `.env` file** in the project root with your API keys:
+4. **Create a `.env` file** in the project root for optional service keys and Flask settings:
 
    ```env
-   OPENAI_API_KEY=sk-your-openai-key-here
    SECRET_KEY=your-flask-secret-key
    # Optional
    IEEE_API_KEY=your-ieee-key-here
@@ -95,8 +93,6 @@ All settings are loaded from environment variables with sensible defaults. See `
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OPENAI_API_KEY` | *(required)* | OpenAI API key for summarization and topic extraction |
-| `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model used for analysis |
 | `SECRET_KEY` | `qnet-dev-secret-key-change-in-prod` | Flask session secret key |
 | `FLASK_DEBUG` | `1` | Enable Flask debug mode (`0` to disable) |
 | `IEEE_API_KEY` | *(empty)* | IEEE Xplore API key; falls back to web scraping if absent |
@@ -122,7 +118,7 @@ The app starts at **http://localhost:5000** by default.
   curl -X POST http://localhost:5000/api/fetch-latest
   ```
 
-This runs all six collectors, deduplicates results, stores them in the database, and triggers AI analysis (summarization, topic extraction, hot topic scoring).
+This runs all collectors, deduplicates results, stores them in the database, and generates local summaries, keyword-based topics, and hot-topic reports.
 
 ## Distributed Computing Research
 
@@ -149,7 +145,7 @@ The distributed-computing search covers topics such as:
 3. Optionally enter a narrower topic, such as `Byzantine consensus`, `edge computing`, or `distributed databases`.
 4. Click **Search live**.
 
-The app searches arXiv, Google Scholar, IEEE Xplore, and curated university and company pages. Results are normalized, deduplicated, saved to SQLite, and summarized with OpenAI when an API key is configured. A standard HTML form fallback allows the search to run even when browser JavaScript is unavailable.
+The app searches arXiv, Google Scholar, IEEE Xplore, and curated university and company pages. Results are normalized, deduplicated, saved to SQLite, and summarized locally. A standard HTML form fallback allows the search to run even when browser JavaScript is unavailable.
 
 Saved discovery results remain separate from the quantum-networking hot-topic rankings, so distributed-computing content does not change the specialized QNet trend scores.
 
@@ -204,7 +200,7 @@ Qnet/
 │
 ├── agent/
 │   ├── core.py             # QNetAgent orchestrator (collect, analyze, query)
-│   ├── analyzer.py         # OpenAI integration (summarize, extract, classify)
+│   ├── analyzer.py         # Local summaries, topic extraction, and classification
 │   ├── collector.py        # Base collector class
 │   └── topic_engine.py     # Hot topic scoring and trend detection
 │
@@ -246,7 +242,7 @@ Qnet/
 |------|-------|-------------|
 | **Dashboard** | `/` | Stats cards, hot topics overview, trend indicators, recent articles |
 | **Articles** | `/articles` | Full-text search across titles/abstracts/authors; filter by source or content type; paginated (50/page) |
-| **Hot Topics** | `/hot-topics` | Ranked topics with composite scores, trend labels, and AI-generated narrative analysis |
+| **Hot Topics** | `/hot-topics` | Ranked topics with composite scores, trend labels, and a data-based report |
 | **Universities** | `/universities` | Directory of pre-configured research groups sorted by country |
 | **Sources** | `/sources` | Catalog of all configured data sources |
 | **Latest** | `/latest` | Summary and results from the most recent collection run |

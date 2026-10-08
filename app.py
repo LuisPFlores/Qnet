@@ -253,7 +253,7 @@ def research_discovery():
 def api_fetch_latest():
     """
     'Give me the last content' – triggers a full collection across all sources,
-    runs AI analysis, updates hot topics, and returns a comprehensive summary.
+    generates local summaries, updates hot topics, and returns a data-based report.
     """
     global _last_fetch_result
 
@@ -399,10 +399,6 @@ def api_simulators():
 if __name__ == "__main__":
     logger.info("Starting QNet Agent...")
     logger.info(f"Database: {config.DB_PATH}")
-    logger.info(f"OpenAI model: {config.OPENAI_MODEL}")
-    logger.info(
-        f"OpenAI API key configured: {'Yes' if config.OPENAI_API_KEY else 'No'}"
-    )
     logger.info(
         f"Auto-fetch interval: {config.FETCH_INTERVAL_HOURS}h"
     )

@@ -89,7 +89,7 @@ class QNetAgent:
             f"Collected {len(all_items)} total items, {len(new_articles)} new articles stored"
         )
 
-        # Analyze new articles with OpenAI
+        # Generate local summaries and extract matching topics
         self._analyze_articles(new_articles)
 
         # Update hot topics
@@ -308,7 +308,7 @@ class QNetAgent:
         return new_articles
 
     def _analyze_articles(self, articles: List[Article]):
-        """Run AI analysis on articles: summarize and extract topics."""
+        """Generate local summaries and extract matching topics for articles."""
         for article in articles:
             # Generate summary
             if article.abstract or article.raw_content:

@@ -63,7 +63,7 @@ class Article(Base):
     title = Column(String(500), nullable=False)
     authors = Column(Text, default="")
     abstract = Column(Text, default="")
-    summary = Column(Text, default="")  # AI-generated summary
+    summary = Column(Text, default="")  # Locally generated extractive summary
     url = Column(Text, default="")
     published_date = Column(DateTime, nullable=True)
     fetched_at = Column(DateTime, default=_utcnow)
@@ -153,7 +153,7 @@ class HotTopicSnapshot(Base):
     id = Column(Integer, primary_key=True)
     generated_at = Column(DateTime, default=_utcnow)
     topics_json = Column(Text, default="[]")  # JSON list of ranked topics
-    analysis_text = Column(Text, default="")  # AI-generated narrative summary
+    analysis_text = Column(Text, default="")  # Topic report based on collected data
 
     def __repr__(self):
         return f"<HotTopicSnapshot {self.generated_at}>"

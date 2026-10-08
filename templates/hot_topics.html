@@ -114,13 +114,13 @@
     </div>
 </div>
 
-<!-- AI Analysis -->
+<!-- Topic report -->
 {% if analysis %}
 <div class="row">
     <div class="col-12">
         <div class="card bg-dark border-secondary">
             <div class="card-header bg-dark border-secondary">
-                <h5 class="mb-0"><i class="bi bi-robot text-info me-2"></i>AI Hot Topics Analysis</h5>
+                <h5 class="mb-0"><i class="bi bi-card-text text-info me-2"></i>Hot Topics Report</h5>
             </div>
             <div class="card-body">
                 <div class="analysis-content">{{ analysis | replace('\n', '<br>') | safe }}</div>

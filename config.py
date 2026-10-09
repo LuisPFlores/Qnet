@@ -384,6 +384,78 @@ RESEARCH_AREAS = {
     },
 }
 
+# ── Distributed and quantum computing research discovery ──────────────
+RESEARCH_AREAS["distributed-quantum-computing"] = {
+    "label": "Distributed + Quantum Computing",
+    "description": (
+        "Research on connecting quantum processors, distributed quantum algorithms, "
+        "quantum internet infrastructure, and hybrid quantum-classical systems."
+    ),
+    "keywords": [
+        "distributed quantum computing",
+        "networked quantum computing",
+        "quantum processor interconnect",
+        "modular quantum computing",
+        "quantum internet",
+        "quantum-classical distributed computing",
+        "distributed quantum algorithms",
+    ],
+    "arxiv_query": (
+        'all:"distributed quantum computing" OR all:"networked quantum computing" OR '
+        'all:"modular quantum computing" OR all:"quantum processor interconnect" OR '
+        'all:"quantum internet"'
+    ),
+    "universities": (
+        RESEARCH_AREAS["quantum-computing"]["universities"]
+        + RESEARCH_AREAS["distributed-computing"]["universities"]
+        + [
+            {
+                "name": "TU Delft – QuTech Quantum Internet",
+                "country": "Netherlands",
+                "url": "https://qutech.nl/research-engineering/quantum-internet/",
+                "key_researchers": "",
+                "description": "Develops quantum networking technologies and networked quantum computing systems.",
+                "focus_areas": "Quantum processor networks, quantum internet, distributed quantum computing",
+            },
+            {
+                "name": "University of Innsbruck – Distributed Quantum Systems",
+                "country": "Austria",
+                "url": "https://www.uibk.ac.at/en/exphys/research/dqs/",
+                "key_researchers": "",
+                "description": "Researches interconnected quantum systems and distributed quantum applications.",
+                "focus_areas": "Ion-trap networks, distributed quantum systems, entanglement",
+            },
+        ]
+    ),
+    "companies": (
+        RESEARCH_AREAS["quantum-computing"]["companies"]
+        + RESEARCH_AREAS["distributed-computing"]["companies"]
+    ),
+    "projects": [
+        {
+            "name": "Quantum Internet Alliance – Full-Stack Prototype Network",
+            "country": "Europe",
+            "url": "https://quantuminternetalliance.org/",
+            "description": "Multi-country research and industry initiative building a full-stack quantum internet prototype.",
+            "focus_areas": "Quantum network infrastructure, distributed quantum processors, protocols, applications",
+        },
+        {
+            "name": "UK Integrated Quantum Networks Hub",
+            "country": "United Kingdom",
+            "url": "https://iqnhub.org/",
+            "description": "University, national-lab, and industry collaboration developing multi-node quantum networks.",
+            "focus_areas": "Networked quantum computing, quantum internet, quantum communication infrastructure",
+        },
+        {
+            "name": "QuTech Networked Quantum Computing",
+            "country": "Netherlands",
+            "url": "https://qutech.nl/research-engineering/quantum-internet/",
+            "description": "Research program connecting quantum processors into scalable computing clusters over quantum networks.",
+            "focus_areas": "Quantum processor interconnects, distributed quantum computing, quantum internet",
+        },
+    ],
+}
+
 # ── Quantum network simulators ────────────────────────────────────────
 SIMULATOR_SOURCES = [
     {

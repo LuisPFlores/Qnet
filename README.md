@@ -120,15 +120,15 @@ The app starts at **http://localhost:5000** by default.
 
 This runs all collectors, deduplicates results, stores them in the database, and generates local summaries, keyword-based topics, and hot-topic reports.
 
-## Distributed Computing Research
+## Distributed and Quantum Computing Research
 
-The **Research Discovery** section extends QNet beyond quantum networking and includes a dedicated **Distributed Computing** research area. Open:
+The **Research Discovery** section includes dedicated **Quantum Computing** and **Distributed Computing** areas, plus a combined **Distributed + Quantum Computing** area for work at their intersection. The combined area searches for networked quantum processors, distributed quantum algorithms, quantum internet infrastructure, and hybrid quantum-classical systems. It includes the organizations listed in both existing computing areas, intersection-specific research groups, and a curated project directory. Open:
 
 ```text
-http://localhost:5000/research-discovery?area=distributed-computing
+http://localhost:5000/research-discovery?area=distributed-quantum-computing
 ```
 
-The distributed-computing search covers topics such as:
+The computing research areas cover topics such as:
 
 - Distributed systems and algorithms
 - Cloud and serverless computing
@@ -141,7 +141,7 @@ The distributed-computing search covers topics such as:
 ### Running a distributed-computing search
 
 1. Open **Research Discovery** from the navigation bar.
-2. Select **Distributed Computing**.
+2. Select **Distributed Computing** or **Distributed + Quantum Computing**.
 3. Optionally enter a narrower topic, such as `Byzantine consensus`, `edge computing`, or `distributed databases`.
 4. Click **Search live**.
 
@@ -149,9 +149,9 @@ The app searches arXiv, Google Scholar, IEEE Xplore, and curated university and 
 
 Saved discovery results remain separate from the quantum-networking hot-topic rankings, so distributed-computing content does not change the specialized QNet trend scores.
 
-### Distributed-computing organizations
+### Computing research organizations and projects
 
-The section includes a curated directory of universities and companies working on distributed systems. Initial entries include MIT CSAIL, UC Berkeley, Stanford, Carnegie Mellon, Cornell, EPFL, ETH Zurich, Cambridge, AWS, Google Cloud, Microsoft Research, Cloudflare, Confluent, Cockroach Labs, Databricks, and Red Hat.
+The combined area includes university and company sources from both existing computing areas, along with organizations focused on networked quantum systems. Its curated project list includes the Quantum Internet Alliance full-stack prototype network, the UK Integrated Quantum Networks Hub, and QuTech Networked Quantum Computing. This is a maintained directory, not an exhaustive census of every global project.
 
 ### API example
 

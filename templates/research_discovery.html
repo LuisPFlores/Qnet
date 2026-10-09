@@ -111,16 +111,18 @@
 
     <div class="col-xl-4">
         <h4 class="mb-3">Research organizations</h4>
-        {% for organization_type in ["university", "company"] %}
+        {% for organization_type in ["university", "company", "project"] %}
+        {% set matching_organizations = organizations|selectattr("organization_type", "equalto", organization_type)|list %}
+        {% if matching_organizations %}
         <div class="card bg-dark border-secondary mb-3">
             <div class="card-header border-secondary">
                 <strong>
-                    <i class="bi {{ 'bi-mortarboard' if organization_type == 'university' else 'bi-building' }} me-2"></i>
-                    {{ "Universities" if organization_type == "university" else "Companies" }}
+                    <i class="bi {{ 'bi-mortarboard' if organization_type == 'university' else 'bi-building' if organization_type == 'company' else 'bi-diagram-3' }} me-2"></i>
+                    {{ "Universities" if organization_type == "university" else "Companies" if organization_type == "company" else "Projects" }}
                 </strong>
             </div>
             <div class="list-group list-group-flush">
-                {% for org in organizations if org.organization_type == organization_type %}
+                {% for org in matching_organizations %}
                 <div class="list-group-item bg-dark text-light border-secondary">
                     <a href="{{ org.url }}" target="_blank" rel="noopener"
                        class="text-info text-decoration-none fw-semibold">{{ org.name }}</a>
@@ -131,6 +133,7 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>

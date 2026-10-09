@@ -167,11 +167,12 @@ def _seed_simulators(session):
 def _seed_research_organizations(session):
     """Seed organizations used by the broader research discovery section."""
     for area, area_config in config.RESEARCH_AREAS.items():
-        for organization_type in ("universities", "companies"):
-            for org in area_config[organization_type]:
-                singular_type = (
-                    "university" if organization_type == "universities" else "company"
-                )
+        for source_key, singular_type in (
+            ("universities", "university"),
+            ("companies", "company"),
+            ("projects", "project"),
+        ):
+            for org in area_config.get(source_key, []):
                 exists = session.query(ResearchOrganization).filter_by(
                     name=org["name"], research_area=area
                 ).first()

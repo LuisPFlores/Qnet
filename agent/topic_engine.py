@@ -161,18 +161,23 @@ class TopicEngine:
             if not topic.articles:
                 continue
 
+            fetched_dates = []
+            for article in topic.articles:
+                fetched_at = article.fetched_at
+                if fetched_at and fetched_at.tzinfo is None:
+                    fetched_at = fetched_at.replace(tzinfo=timezone.utc)
+                fetched_dates.append(fetched_at)
+
             # Count mentions in first half vs second half of the period
             early_count = sum(
                 1
-                for a in topic.articles
-                if a.fetched_at
-                and a.fetched_at >= cutoff
-                and a.fetched_at < midpoint
+                for fetched_at in fetched_dates
+                if fetched_at and cutoff <= fetched_at < midpoint
             )
             recent_count = sum(
                 1
-                for a in topic.articles
-                if a.fetched_at and a.fetched_at >= midpoint
+                for fetched_at in fetched_dates
+                if fetched_at and fetched_at >= midpoint
             )
 
             if early_count == 0 and recent_count > 0:
